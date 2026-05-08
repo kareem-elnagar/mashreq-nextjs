@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects — Mashreq Solar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#245db2', accent: '#ffce07' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans text-gray-900 bg-white">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <img src="img/Logo.png" alt="Mashreq Logo" class="h-10 w-auto">
+                    <span class="font-bold text-xl tracking-tight text-primary">MASHREQ</span>
+                </a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-sm font-medium text-gray-500 hover:text-primary">Home</a>
+                    <a href="projects.html" class="text-sm font-medium text-primary border-b-2 border-primary">Projects</a>
+                    <a href="systems.html" class="text-sm font-medium text-gray-500 hover:text-primary">Systems</a>
+                    <a href="contact.html" class="text-sm font-medium text-gray-500 hover:text-primary">Contact</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-btn" class="text-primary p-2 focus:outline-none"><i data-lucide="menu" size="24"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-lg">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="index.html" class="block px-3 py-4 text-base font-medium text-gray-600">Home</a>
+                <a href="projects.html" class="block px-3 py-4 text-base font-medium bg-blue-50 text-primary rounded-md">Projects</a>
+                <a href="systems.html" class="block px-3 py-4 text-base font-medium text-gray-600">Systems</a>
+                <a href="contact.html" class="block px-3 py-4 text-base font-medium text-gray-600">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="bg-gray-50 py-16 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl font-bold text-primary">Operational Projects</h1>
+            <p class="mt-4 text-xl text-gray-600 max-w-2xl">A track record of systems running under real field conditions. No placeholders, just operational data.</p>
+        </div>
+    </div>
+
+    <!-- Projects Grid -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <!-- Project 1 -->
+            <div class="group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl transition-all">
+                <div class="relative h-64 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover">
+                    <div class="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full flex items-center shadow-lg">
+                        <i data-lucide="activity" class="w-3 h-3 mr-1 text-accent"></i> Operational
+                    </div>
+                </div>
+                <div class="p-8 flex-grow flex flex-col">
+                    <div class="flex items-center space-x-4 text-xs text-gray-400 mb-4 uppercase font-bold tracking-widest">
+                        <span><i data-lucide="map-pin" class="inline w-3 h-3 mr-1"></i> Minya, Egypt</span>
+                        <span><i data-lucide="calendar" class="inline w-3 h-3 mr-1"></i> 2023</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-primary mb-4">Hybrid Solar System — 50 Feddan Farm</h2>
+                    <p class="text-gray-600 text-sm mb-6 line-clamp-3">Daily irrigation cycles are now covered 80% by solar. Diesel consumption has dropped by over 70%.</p>
+                    <div class="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
+                        <span class="text-xs font-bold text-gray-500">50 FEDDAN</span>
+                        <a href="project-detail.html" class="text-primary font-bold inline-flex items-center group/btn">View Details <i data-lucide="arrow-right" class="ml-2 h-4 w-4 group-hover/btn:translate-x-1"></i></a>
+                    </div>
+                </div>
+            </div>
+            <!-- Project 2 -->
+            <div class="group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl transition-all">
+                <div class="relative h-64 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1466611653911-954ffaa13b6f?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover">
+                    <div class="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full flex items-center shadow-lg">
+                        <i data-lucide="activity" class="w-3 h-3 mr-1 text-accent"></i> Operational
+                    </div>
+                </div>
+                <div class="p-8 flex-grow flex flex-col">
+                    <div class="flex items-center space-x-4 text-xs text-gray-400 mb-4 uppercase font-bold tracking-widest">
+                        <span><i data-lucide="map-pin" class="inline w-3 h-3 mr-1"></i> Wadi El Natrun</span>
+                        <span><i data-lucide="calendar" class="inline w-3 h-3 mr-1"></i> 2022</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-primary mb-4">Off-Grid Water Pumping — Desert Reclamation</h2>
+                    <p class="text-gray-600 text-sm mb-6 line-clamp-3">Successfully reclaimed 120 feddans of desert land. The system has run for 3 years with zero downtime.</p>
+                    <div class="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
+                        <span class="text-xs font-bold text-gray-500">120 FEDDAN</span>
+                        <a href="project-detail.html" class="text-primary font-bold inline-flex items-center group/btn">View Details <i data-lucide="arrow-right" class="ml-2 h-4 w-4 group-hover/btn:translate-x-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-50 border-t border-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center space-y-8 md:space-y-0 text-gray-500">
+            <div><div class="font-bold text-xl text-primary tracking-tight">MASHREQ</div><p class="mt-2 text-sm max-w-xs">Engineering for real-world operation.</p></div>
+            <div class="text-sm">© 2026 Mashreq Engineering. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
+    </script>
+</body>
+</html>

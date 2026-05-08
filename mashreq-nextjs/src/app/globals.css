@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 15, 23, 42;
+  --background-start-rgb: 241, 245, 249; /* Darker tinted slate */
+  --background-end-rgb: 226, 232, 240;
+  --primary: #1e4b8f;
+  --accent: #ffce07;
+  --tinted-bg: #f1f5f9;
+}
+
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: var(--tinted-bg);
+  @apply antialiased;
+}
+
+@layer utilities {
+  .smart-shape {
+    @apply absolute rounded-full opacity-10 pointer-events-none;
+    background: linear-gradient(135deg, #245db2, #ffce07);
+    filter: blur(40px);
+  }
+  
+  .glass-tint {
+    background: rgba(248, 250, 252, 0.8);
+    backdrop-filter: blur(12px);
+  }
+}
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-extrabold tracking-tight text-[#1e4b8f];
+  }
+}
+
+

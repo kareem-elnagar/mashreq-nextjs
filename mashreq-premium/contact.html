@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact — Mashreq Solar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#245db2', accent: '#ffce07' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans text-gray-900 bg-white">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <img src="img/Logo.png" alt="Mashreq Logo" class="h-10 w-auto">
+                    <span class="font-bold text-xl tracking-tight text-primary">MASHREQ</span>
+                </a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-sm font-medium text-gray-500 hover:text-primary">Home</a>
+                    <a href="projects.html" class="text-sm font-medium text-gray-500 hover:text-primary">Projects</a>
+                    <a href="systems.html" class="text-sm font-medium text-gray-500 hover:text-primary">Systems</a>
+                    <a href="contact.html" class="text-sm font-medium text-primary border-b-2 border-primary">Contact</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-btn" class="text-primary p-2 focus:outline-none"><i data-lucide="menu" size="24"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-lg">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="index.html" class="block px-3 py-4 text-base font-medium text-gray-600">Home</a>
+                <a href="projects.html" class="block px-3 py-4 text-base font-medium text-gray-600">Projects</a>
+                <a href="systems.html" class="block px-3 py-4 text-base font-medium text-gray-600">Systems</a>
+                <a href="contact.html" class="block px-3 py-4 text-base font-medium bg-blue-50 text-primary rounded-md">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+            <div class="space-y-12">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-bold text-primary mb-6">Technical Consultation</h1>
+                    <p class="text-xl text-gray-600 leading-relaxed max-w-lg">We don't start with equipment. We start with how your system needs to run.</p>
+                </div>
+                <div class="space-y-8">
+                    <div class="flex items-start space-x-6">
+                        <div class="bg-blue-50 p-4 rounded-2xl"><i data-lucide="mail" class="h-6 w-6 text-primary"></i></div>
+                        <div><h3 class="font-bold text-primary">Direct Email</h3><p class="text-gray-500">engineering@mashreqsolar.com</p></div>
+                    </div>
+                    <div class="flex items-start space-x-6">
+                        <div class="bg-blue-50 p-4 rounded-2xl"><i data-lucide="phone" class="h-6 w-6 text-primary"></i></div>
+                        <div><h3 class="font-bold text-primary">Office Support</h3><p class="text-gray-500">+20 123 456 7890</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-100 rounded-[2.5rem] shadow-2xl p-8 md:p-12 relative overflow-hidden">
+                <form id="contact-form" class="space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-primary uppercase tracking-widest">Full Name</label>
+                            <input required type="text" class="w-full bg-gray-50 border-none rounded-xl px-4 py-4 outline-none transition-all focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-primary uppercase tracking-widest">Phone Number</label>
+                            <input required type="tel" class="w-full bg-gray-50 border-none rounded-xl px-4 py-4 outline-none transition-all focus:ring-2 focus:ring-primary">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-primary uppercase tracking-widest">Main Issue / Goal</label>
+                        <select class="w-full bg-gray-50 border-none rounded-xl px-4 py-4 outline-none transition-all focus:ring-2 focus:ring-primary">
+                            <option>Reducing Fuel/Electricity Cost</option>
+                            <option>System Reliability / Stopping Issues</option>
+                            <option>Expanding Current Capacity</option>
+                            <option>New Site Development</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white py-5 rounded-xl font-bold text-lg flex items-center justify-center group hover:bg-blue-700 transition-all shadow-xl">
+                        Submit for Technical Review <i data-lucide="send" class="ml-3 h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
+                    </button>
+                </form>
+                <div id="success-msg" class="hidden py-20 text-center space-y-6">
+                    <div class="inline-flex items-center justify-center bg-green-50 p-4 rounded-full mb-4"><i data-lucide="check-circle-2" class="h-12 w-12 text-green-600"></i></div>
+                    <h2 class="text-3xl font-bold text-primary">Brief Received</h2>
+                    <p class="text-gray-600 max-w-sm mx-auto">An engineer will contact you within 24-48 hours.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-50 border-t border-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto text-gray-500">
+            <div class="font-bold text-xl text-primary tracking-tight">MASHREQ</div>
+            <div class="text-sm">© 2026 Mashreq Engineering. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            document.getElementById('contact-form').classList.add('hidden');
+            document.getElementById('success-msg').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>

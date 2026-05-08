@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mashreq Solar — Engineering for Real Operation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#245db2',
+                        accent: '#ffce07',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .hero-gradient { background: linear-gradient(to right, rgba(36, 93, 178, 0.9), rgba(36, 93, 178, 0.2)); }
+    </style>
+</head>
+<body class="font-sans text-gray-900 bg-white">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <img src="img/Logo.png" alt="Mashreq Logo" class="h-10 w-auto">
+                    <span class="font-bold text-xl tracking-tight text-primary">MASHREQ</span>
+                </a>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-sm font-medium text-primary border-b-2 border-primary">Home</a>
+                    <a href="projects.html" class="text-sm font-medium text-gray-500 hover:text-primary transition-colors">Projects</a>
+                    <a href="systems.html" class="text-sm font-medium text-gray-500 hover:text-primary transition-colors">Systems</a>
+                    <a href="contact.html" class="text-sm font-medium text-gray-500 hover:text-primary transition-colors">Contact</a>
+                </div>
+
+                <div class="md:hidden">
+                    <button id="menu-btn" class="text-primary p-2 focus:outline-none">
+                        <i data-lucide="menu" size="24"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-lg">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="index.html" class="block px-3 py-4 text-base font-medium bg-blue-50 text-primary rounded-md">Home</a>
+                <a href="projects.html" class="block px-3 py-4 text-base font-medium text-gray-600 hover:bg-gray-50 rounded-md">Projects</a>
+                <a href="systems.html" class="block px-3 py-4 text-base font-medium text-gray-600 hover:bg-gray-50 rounded-md">Systems</a>
+                <a href="contact.html" class="block px-3 py-4 text-base font-medium text-gray-600 hover:bg-gray-50 rounded-md">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SECTION 1 — HERO -->
+    <section class="relative h-[85vh] min-h-[600px] flex items-center overflow-hidden bg-primary">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=2000" alt="Solar Water Pumping System" class="w-full h-full object-cover opacity-40 grayscale-[20%]">
+            <div class="absolute inset-0 hero-gradient"></div>
+        </div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-2xl">
+                <h1 class="text-4xl md:text-6xl font-bold text-white leading-tight">
+                    Solar systems that keep working when it matters
+                </h1>
+                <p class="mt-6 text-xl text-blue-50/90 font-medium">
+                    Designed for real farm conditions — not just installation day. We prioritize long-term operation over marketing claims.
+                </p>
+                <div class="mt-10 flex flex-wrap gap-4">
+                    <a href="projects.html" class="bg-accent text-primary px-8 py-4 rounded-md font-bold text-lg hover:bg-white transition-all flex items-center group">
+                        View Projects
+                        <i data-lucide="arrow-right" class="ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                    <a href="contact.html" class="bg-white/10 glass text-white px-8 py-4 rounded-md font-bold text-lg hover:bg-white/20 transition-all">
+                        Talk to an Engineer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2 — PROOF -->
+    <section class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+                <div class="max-w-2xl">
+                    <h2 class="text-3xl font-bold text-primary">Operational Performance</h2>
+                    <p class="mt-4 text-lg text-gray-600">
+                        While others focus on installation numbers, we measure success by months and years of stable operation under field conditions.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="group cursor-default">
+                    <div class="relative h-48 overflow-hidden rounded-lg mb-4">
+                        <img src="https://images.unsplash.com/photo-1548337138-e87d889cc369?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <h3 class="font-bold text-lg text-primary">Peak Summer Load</h3>
+                    <p class="text-gray-500 text-sm mt-1">Stable output during 45°C+ heatwaves</p>
+                </div>
+                <div class="group cursor-default">
+                    <div class="relative h-48 overflow-hidden rounded-lg mb-4">
+                        <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <h3 class="font-bold text-lg text-primary">2+ Years Operation</h3>
+                    <p class="text-gray-500 text-sm mt-1">Systems running with zero unplanned downtime</p>
+                </div>
+                <div class="group cursor-default">
+                    <div class="relative h-48 overflow-hidden rounded-lg mb-4">
+                        <img src="https://images.unsplash.com/photo-1466611653911-954ffaa13b6f?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <h3 class="font-bold text-lg text-primary">Daily Irrigation</h3>
+                    <p class="text-gray-500 text-sm mt-1">Supporting 500+ feddans of reclaimed land</p>
+                </div>
+                <div class="group cursor-default">
+                    <div class="relative h-48 overflow-hidden rounded-lg mb-4">
+                        <img src="https://images.unsplash.com/photo-1594398044700-143603d223f2?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <h3 class="font-bold text-lg text-primary">Diesel Replacement</h3>
+                    <p class="text-gray-500 text-sm mt-1">Reducing fuel dependence by up to 85%</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3 — HOW MASHREQ THINKS -->
+    <section class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <div class="flex flex-col items-start">
+                    <div class="bg-white p-3 rounded-xl shadow-sm mb-6 text-primary"><i data-lucide="factory" size="32"></i></div>
+                    <h3 class="text-xl font-bold text-primary mb-3">Design for Operation</h3>
+                    <p class="text-gray-600 leading-relaxed">We don't just calculate theoretical output. We factor in dust, heat, and load variations that occur in the field.</p>
+                </div>
+                <div class="flex flex-col items-start">
+                    <div class="bg-white p-3 rounded-xl shadow-sm mb-6 text-primary"><i data-lucide="shield-check" size="32"></i></div>
+                    <h3 class="text-xl font-bold text-primary mb-3">Failure Point Analysis</h3>
+                    <p class="text-gray-600 leading-relaxed">Every system is reviewed for potential failure points before installation. We solve problems on paper first.</p>
+                </div>
+                <div class="flex flex-col items-start">
+                    <div class="bg-white p-3 rounded-xl shadow-sm mb-6 text-primary"><i data-lucide="droplet" size="32"></i></div>
+                    <h3 class="text-xl font-bold text-primary mb-3">Matching Real Use</h3>
+                    <p class="text-gray-600 leading-relaxed">We don't over-size for profit or under-size for price. We match the system to your specific irrigation schedule.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 6 — CTA -->
+    <section class="py-24 bg-primary text-white text-center">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">If your system stops, everything stops.</h2>
+            <p class="text-xl text-blue-100 mb-10">Start with a design that considers real field conditions before equipment selection.</p>
+            <a href="contact.html" class="inline-block bg-accent text-primary px-10 py-4 rounded-md font-bold text-lg hover:bg-white transition-all shadow-xl">
+                Start Your Technical Assessment
+            </a>
+        </div>
+    </section>
+
+    <footer class="bg-gray-50 border-t border-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center space-y-8 md:space-y-0">
+            <div>
+                <div class="font-bold text-xl text-primary tracking-tight">MASHREQ</div>
+                <p class="mt-2 text-sm text-gray-500 max-w-xs">Solar systems that keep working when it matters. Designed for real-world operation.</p>
+            </div>
+            <div class="text-sm text-gray-400">© 2026 Mashreq Engineering. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    </script>
+</body>
+</html>
