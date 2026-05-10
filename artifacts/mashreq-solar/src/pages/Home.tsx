@@ -1,86 +1,180 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowRight, Factory, Droplet, ShieldCheck } from "lucide-react";
-import { projects } from "@/lib/data";
+import { ArrowRight, Factory, ShieldCheck, Droplet, TrendingUp, Clock, Sun } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col w-full relative overflow-hidden bg-slate-50/50">
-      <div className="smart-shape w-[500px] h-[500px] -top-20 -left-20 animate-pulse" />
-      <div className="smart-shape w-[400px] h-[400px] top-[40%] -right-20 animate-bounce" style={{ animationDuration: '10s' }} />
-      <div className="smart-shape w-[300px] h-[300px] -bottom-20 left-[20%]" />
+    <div className="flex flex-col w-full bg-white">
 
-      <section className="relative h-[85vh] min-h-[600px] flex items-center overflow-hidden rounded-b-[4rem] shadow-2xl bg-[#1e4b8f]">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=1600"
-            alt="Mashreq Solar Installation"
-            className="w-full h-full object-cover opacity-60"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a] via-[#0f172a]/40 to-transparent" />
-        </div>
+      {/* ── HERO ─────────────────────────────────────────────── */}
+      <section className="relative h-[90vh] min-h-[620px] flex items-center overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=1600"
+          alt="Mashreq Solar Installation"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Clean dark overlay — left heavy, fades right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1e]/90 via-[#0a0f1e]/60 to-[#0a0f1e]/20" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-2xl"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+            className="max-w-xl"
           >
-            <h1 className="text-4xl md:text-6xl font-black text-white leading-tight drop-shadow-2xl">
-              Solar systems that keep working when it matters
-            </h1>
-            <p className="mt-6 text-xl text-blue-50 font-bold drop-shadow-lg">
-              Designed for real farm conditions — not just installation day.
+            {/* Eyebrow */}
+            <p className="text-xs font-bold tracking-[0.25em] text-[#ffce07] uppercase mb-6">
+              Engineering for Real Operation
             </p>
-            <div className="mt-10 flex flex-wrap gap-4">
+
+            <h1 className="text-4xl md:text-[3.5rem] font-black text-white leading-[1.1] mb-6">
+              Solar systems that keep working<br className="hidden md:block" /> when it matters.
+            </h1>
+
+            <p className="text-base text-white/70 leading-relaxed mb-10 max-w-md">
+              Designed for real farm conditions — not just installation day.
+              Dust, heat, and load variations accounted for.
+            </p>
+
+            <div className="flex flex-wrap gap-4">
               <Link
                 href="/projects"
-                className="bg-white text-accent px-8 py-4 rounded-2xl font-black text-lg hover:scale-105 transition-all flex items-center group shadow-2xl shadow-accent/20"
+                className="flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold text-white border border-white/30 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all group"
               >
                 View Projects
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="/contact"
+                className="flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold text-[#0a0f1e] bg-[#ffce07] hover:bg-yellow-300 transition-all"
+              >
+                Get Assessment
               </Link>
             </div>
           </motion.div>
         </div>
+
+        {/* Bottom fade into white */}
+        <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white to-transparent" />
       </section>
 
-      <section className="py-24 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-16 relative inline-block">
-            Operational Performance
-            <div className="absolute -bottom-2 left-0 w-full h-1 bg-accent rounded-full" />
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+      {/* ── STATS STRIP ──────────────────────────────────────── */}
+      <section className="bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10 grid grid-cols-3 divide-x divide-slate-100">
+          {[
+            { value: "80%", label: "Solar Coverage", sub: "average across projects" },
+            { value: "70%+", label: "Diesel Reduction", sub: "documented field results" },
+            { value: "36mo+", label: "Uptime Record", sub: "zero growing-season downtime" },
+          ].map((stat, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="px-8 first:pl-0 last:pr-0 text-center"
+            >
+              <p className="text-3xl md:text-4xl font-black text-[#1e4b8f]">{stat.value}</p>
+              <p className="text-sm font-bold text-slate-800 mt-1">{stat.label}</p>
+              <p className="text-xs text-slate-400 mt-0.5">{stat.sub}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── OPERATIONAL PERFORMANCE ──────────────────────────── */}
+      <section className="py-28 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="mb-16">
+            <p className="text-xs font-bold tracking-[0.2em] text-[#ffce07] uppercase mb-3">Why Mashreq</p>
+            <h2 className="text-3xl md:text-4xl font-black text-[#1e4b8f] max-w-lg leading-tight">
+              Built around how the system will actually run
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Factory, title: "Design for Operation", text: "We factor in dust, heat, and load variations." },
-              { icon: ShieldCheck, title: "Failure Analysis", text: "We solve problems on paper before installation." },
-              { icon: Droplet, title: "Matching Real Use", text: "Matching systems to your specific schedule." },
+              {
+                icon: Factory,
+                title: "Design for Operation",
+                text: "Every system is sized for dust accumulation, summer heat derating, and real load curves — not theoretical peak output.",
+                accent: "#1e4b8f",
+              },
+              {
+                icon: ShieldCheck,
+                title: "Failure Analysis First",
+                text: "We simulate failure modes on paper before a single panel goes in. If the system has a weakness, we find it during design.",
+                accent: "#1e4b8f",
+              },
+              {
+                icon: Droplet,
+                title: "Matched to Your Schedule",
+                text: "Pump sizing, battery capacity, and array orientation are tuned to your exact irrigation windows — not generic benchmarks.",
+                accent: "#1e4b8f",
+              },
             ].map((item, i) => (
               <motion.div
                 key={i}
-                whileHover={{ y: -10 }}
-                className="flex flex-col items-center bg-white/80 backdrop-blur-sm p-10 rounded-[3rem] border border-white/50 shadow-xl shadow-blue-900/5"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.12, duration: 0.5 }}
+                whileHover={{ y: -6 }}
+                className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm hover:shadow-md transition-all group"
               >
-                <div className="bg-primary/10 p-6 rounded-3xl mb-6 text-primary"><item.icon size={32} /></div>
-                <h3 className="text-xl font-bold text-primary mb-3">{item.title}</h3>
-                <p className="text-slate-700 leading-relaxed">{item.text}</p>
+                <div
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center mb-6"
+                  style={{ backgroundColor: `${item.accent}12` }}
+                >
+                  <item.icon size={22} style={{ color: item.accent }} />
+                </div>
+                <h3 className="text-base font-bold text-slate-900 mb-3">{item.title}</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">{item.text}</p>
               </motion.div>
+            ))}
+          </div>
+
+          {/* Second row — process steps */}
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-0 bg-[#1e4b8f] rounded-3xl overflow-hidden">
+            {[
+              { icon: Sun, step: "01", label: "Site Assessment", desc: "Load profile, irradiance, and field conditions reviewed before any proposal." },
+              { icon: TrendingUp, step: "02", label: "System Design", desc: "Engineering-grade sizing with failure scenarios and seasonal variation baked in." },
+              { icon: Clock, step: "03", label: "Operational Handover", desc: "We stay involved through the first season to verify performance matches design." },
+            ].map((item, i) => (
+              <div key={i} className="px-10 py-10 border-r border-white/10 last:border-0">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-[10px] font-black tracking-[0.2em] text-white/40 uppercase">{item.step}</span>
+                  <item.icon size={16} className="text-[#ffce07]" />
+                </div>
+                <h4 className="text-base font-bold text-white mb-2">{item.label}</h4>
+                <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-24 bg-[#0f172a] text-white text-center relative overflow-hidden">
-        <div className="smart-shape w-[300px] h-[300px] top-0 right-0 opacity-20" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <h2 className="text-3xl md:text-5xl font-black mb-8 leading-tight">If your system stops,<br />everything stops.</h2>
-          <Link href="/contact" className="inline-block bg-white text-accent px-12 py-5 rounded-[2rem] font-black text-xl hover:scale-105 transition-all shadow-2xl shadow-accent/10">
+      {/* ── CTA ──────────────────────────────────────────────── */}
+      <section className="py-28 bg-white">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <p className="text-xs font-bold tracking-[0.2em] text-[#ffce07] uppercase mb-4">Ready to start</p>
+          <h2 className="text-3xl md:text-5xl font-black text-[#1e4b8f] leading-tight mb-6">
+            If your system stops,<br />everything stops.
+          </h2>
+          <p className="text-slate-500 mb-10 max-w-md mx-auto">
+            Tell us your setup. We'll review it and tell you exactly what the engineering should look like.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 px-10 py-4 rounded-full bg-[#1e4b8f] text-white font-bold hover:bg-blue-800 transition-all text-sm shadow-lg shadow-blue-900/20"
+          >
             Start Your Assessment
+            <ArrowRight size={16} />
           </Link>
         </div>
       </section>
+
     </div>
   );
 }
