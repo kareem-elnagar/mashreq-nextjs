@@ -30,7 +30,7 @@ export const projects: Project[] = [
     location: "Minya, Egypt",
     year: "2023",
     size: "50 Feddan",
-    image: "https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=1200",
+    image: "/img/project-hybrid-farm.png",
     situation: "The farm depended entirely on diesel for irrigation. Fuel costs were fluctuating wildly, and supply was inconsistent during peak summer months, risking crop loss.",
     decision: "A hybrid system was chosen to prioritize solar energy during the day while maintaining the diesel generator as a backup for peak load or night cycles. This balance ensured irrigation never stops.",
     system: "80kW Photovoltaic array with a smart controller that manages the switch between solar and generator power based on real-time load requirements.",
@@ -43,7 +43,7 @@ export const projects: Project[] = [
     location: "Wadi El Natrun",
     year: "2022",
     size: "120 Feddan",
-    image: "https://images.unsplash.com/photo-1466611653911-954ffaa13b6f?auto=format&fit=crop&q=80&w=1200",
+    image: "/img/project-offgrid-pumping.png",
     situation: "Remote desert location with no grid access. Drilling was completed, but bringing in diesel fuel for continuous pumping was economically unfeasible due to transport costs.",
     decision: "Fully off-grid solar pumping system. We optimized the pump size to match the peak solar window, ensuring maximum water discharge during daylight hours.",
     system: "120kW Submersible pump powered by a tracking solar array to extend the pumping window from early morning to late afternoon.",
@@ -61,7 +61,7 @@ export const systems: SystemType[] = [
     whenNotToUse: "Not suitable for critical loads that require 24/7 power without backup.",
     risks: "Full dependence on solar availability. Cloudy days will reduce pump output immediately.",
     limitations: "Operating window is strictly tied to the sun.",
-    image: "https://images.unsplash.com/photo-1548337138-e87d889cc369?auto=format&fit=crop&q=80&w=1200"
+    image: "/img/system-offgrid.png"
   },
   {
     slug: "on-grid-solar",
@@ -71,7 +71,7 @@ export const systems: SystemType[] = [
     whenNotToUse: "Not for backup power (anti-islanding safety).",
     risks: "No power during grid outages. Fully dependent on grid stability.",
     limitations: "Export limits may apply based on local regulations.",
-    image: "https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&q=80&w=1200"
+    image: "/img/system-ongrid.png"
   },
   {
     slug: "hybrid-diesel-solar",
@@ -81,6 +81,6 @@ export const systems: SystemType[] = [
     whenNotToUse: "If the generator is end-of-life or poorly maintained.",
     risks: "Requires complex synchronization controllers.",
     limitations: "Higher initial complexity and maintenance.",
-    image: "https://images.unsplash.com/photo-1594398044700-143603d223f2?auto=format&fit=crop&q=80&w=1200"
+    image: "/img/system-hybrid.png"
   }
 ];
