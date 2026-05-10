@@ -4,17 +4,24 @@ import { ArrowRight, Factory, ShieldCheck, Droplet, TrendingUp, Clock, Sun } fro
 
 export default function Home() {
   return (
-    <div className="flex flex-col w-full bg-white">
+    <div className="flex flex-col w-full bg-white relative">
+
+      {/* Decorative blur shapes — behind everything */}
+      <div className="smart-shape w-[600px] h-[600px] -top-32 -left-32 opacity-20 pointer-events-none absolute z-0" />
+      <div className="smart-shape w-[500px] h-[500px] top-[35%] -right-40 opacity-15 pointer-events-none absolute z-0" style={{ animationDuration: '12s' }} />
+      <div className="smart-shape w-[350px] h-[350px] bottom-0 left-[30%] opacity-10 pointer-events-none absolute z-0" />
 
       {/* ── HERO ─────────────────────────────────────────────── */}
-      <section className="relative h-[90vh] min-h-[620px] flex items-center overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=1600"
-          alt="Mashreq Solar Installation"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+      <section
+        className="relative h-[90vh] min-h-[620px] flex items-center overflow-hidden rounded-b-[3rem] shadow-2xl"
+        style={{
+          backgroundImage: "url('/hero-bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         {/* Clean dark overlay — left heavy, fades right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1e]/90 via-[#0a0f1e]/60 to-[#0a0f1e]/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1e]/90 via-[#0a0f1e]/55 to-[#0a0f1e]/10 z-0" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full">
           <motion.div

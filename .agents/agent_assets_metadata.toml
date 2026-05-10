@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "VidSyyAhnMQxuHgm8nc-x"
+uri = "file://artifacts/mashreq-solar/public/hero-bg.png"
+type = "image"
+title = "generated_image"
