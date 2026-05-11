@@ -1,0 +1,38 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "VidSyyAhnMQxuHgm8nc-x"
+uri = "file://artifacts/mashreq-solar/public/hero-bg.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "7qyTm_Ucju-UC5zufcLim"
+uri = "file://artifacts/mashreq-solar/public/img/project-hybrid-farm.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ykm2c7vj-hCH087pqJ9YX"
+uri = "file://artifacts/mashreq-solar/public/img/project-offgrid-pumping.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "0Eg3jxAvRrYE9a7c6kmGq"
+uri = "file://artifacts/mashreq-solar/public/img/system-offgrid.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "zD7K4mFY-NnmAxQuJEijj"
+uri = "file://artifacts/mashreq-solar/public/img/system-ongrid.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Vz4mfvl8_Iw-kzTd1XYX6"
+uri = "file://artifacts/mashreq-solar/public/img/system-hybrid.png"
+type = "image"
+title = "generated_image"
