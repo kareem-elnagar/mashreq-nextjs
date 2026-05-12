@@ -32,8 +32,8 @@ export interface SystemType {
 
 export const projects: Project[] = [
   {
-    slug: "el-fahl-farm-ismailia",
-    title: "El Fahl Farm — Solar Pumping",
+    slug: "ismailia-project-solar-pumping",
+    title: "Ismailia Project — Solar Pumping",
     client: "El Hajj Ziad El Fahl",
     location: "Ismailia, Egypt",
     year: "2024",
@@ -49,8 +49,8 @@ export const projects: Project[] = [
     ],
     stats: [
       { label: "Capacity", value: "27.6 kW" },
-      { label: "System Type", value: "Hybrid Solar" },
-      { label: "Grid Backup", value: "Included" },
+      { label: "System Type", value: "Hybrid" },
+      { label: "Grid Backup", value: "Yes" },
     ],
     situation: "The farm relied heavily on conventional grid electricity for irrigation, with continuously rising operating costs and dependence on grid stability.",
     decision: "A solar pumping system was designed to use solar energy as the primary operating source while retaining grid electricity as a flexible backup when needed — giving operational continuity without full diesel or grid lock-in.",
@@ -69,7 +69,7 @@ export const projects: Project[] = [
     stats: [
       { label: "Capacity", value: "144 kW" },
       { label: "System Type", value: "On-Grid" },
-      { label: "Annual Savings", value: "EGP 600K" },
+      { label: "Savings/yr", value: "EGP 600K" },
     ],
     situation: "Yathreb Farm in Beheira operated irrigation systems and poultry farm units on full conventional grid electricity, with continuously high and growing energy consumption.",
     decision: "Two on-grid solar systems totaling 144 kW were designed to cover daily operational loads — reducing grid dependence and locking in long-term operating cost stability.",
@@ -88,7 +88,7 @@ export const projects: Project[] = [
     gallery: Array.from({ length: 8 }, (_, i) => `/img/projects/art-land/${i + 1}.jpg`),
     stats: [
       { label: "Capacity", value: "150 kW" },
-      { label: "System Type", value: "Hybrid Solar" },
+      { label: "System Type", value: "Hybrid" },
       { label: "Farm Area", value: "240 Fed." },
     ],
     situation: "A 240-feddan palm and fig farm in West Minya was running irrigation entirely on diesel, with high and volatile monthly fuel costs that threatened operational stability.",
@@ -107,7 +107,7 @@ export const projects: Project[] = [
     gallery: ["/img/project-hybrid-farm.png"],
     stats: [
       { label: "Capacity", value: "80 kW" },
-      { label: "System Type", value: "Hybrid Solar" },
+      { label: "System Type", value: "Hybrid" },
       { label: "Diesel Cut", value: "70%+" },
     ],
     situation: "The farm depended entirely on diesel for irrigation. Fuel costs were fluctuating wildly, and supply was inconsistent during peak summer months, risking crop loss.",
