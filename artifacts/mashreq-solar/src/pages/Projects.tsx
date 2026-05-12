@@ -75,11 +75,14 @@ export default function ProjectsPage() {
                 </p>
 
                 {/* Stats strip */}
-                <div className="grid grid-cols-3 gap-2 mb-6">
+                <div className="grid grid-cols-3 gap-2 mb-6 items-stretch">
                   {project.stats.map((s) => (
-                    <div key={s.label} className="bg-blue-50 rounded-xl p-3 text-center">
-                      <p className="text-primary font-black text-sm leading-tight">{s.value}</p>
-                      <p className="text-[9px] text-blue-400 uppercase tracking-wider mt-0.5 font-semibold leading-tight">{s.label}</p>
+                    <div
+                      key={s.label}
+                      className="bg-blue-50 rounded-xl px-2 py-3 flex flex-col items-center justify-center text-center min-h-[64px]"
+                    >
+                      <p className="text-primary font-black text-sm leading-tight truncate w-full text-center">{s.value}</p>
+                      <p className="text-[9px] text-blue-400 uppercase tracking-wider mt-1 font-semibold leading-tight text-center">{s.label}</p>
                     </div>
                   ))}
                 </div>
