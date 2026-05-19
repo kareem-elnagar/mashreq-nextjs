@@ -158,3 +158,26 @@ overrides:
   # drizzle-kit uses esbuild internally on an older version that's vulnerable, this overrides it
   "@esbuild-kit/esm-loader": "npm:tsx@^4.21.0"
   esbuild: "0.27.3"
+  # Security overrides: force patched versions of vulnerable transitive dependencies
+  # picomatch v2 (GHSA-c2c7-rcm5-vvqj, GHSA-3v7f-55p6-f55p) — used by micromatch/fast-glob
+  "picomatch@^2": "^2.3.2"
+  # picomatch v4 (GHSA-c2c7-rcm5-vvqj, GHSA-3v7f-55p6-f55p) — used by vite
+  "picomatch@^4": "^4.0.4"
+  # path-to-regexp (GHSA-j3q9-mxjg-w52f, GHSA-27v5-c462-wpq7) — used by express/router
+  "path-to-regexp": "^8.4.0"
+  # lodash (GHSA-r5fr-rjxr-66jc, GHSA-f23m-r3pf-42rh) — used by recharts
+  "lodash": "^4.18.0"
+  # fast-uri (GHSA-q3j6-qgpj-74h6, GHSA-v39h-62p7-jpjc) — used by ajv
+  "fast-uri": "^3.1.2"
+  # brace-expansion (GHSA-f886-m6hf-6m8v) — used by minimatch/typedoc
+  "brace-expansion@^2": "^2.0.3"
+  # yaml (GHSA-48c2-rrv3-qjmp) — used by vite
+  "yaml": "^2.8.3"
+  # postcss (GHSA-qx2v-qp2m-jg93) — used by vite
+  "postcss": "^8.5.10"
+  # next (GHSA-267c-6grr-h53f, GHSA-26hh-7cqf-hhc6, GHSA-36qx-fr4f-26g5,
+  #       GHSA-492v-c6pp-mqqv, GHSA-8h8q-6873-q5fj, GHSA-c4j6-fc7j-m34r,
+  #       GHSA-mg66-mrh9-m8jx, GHSA-ffhc-5mcf-pf4q, GHSA-gx5p-jg67-6x7h,
+  #       GHSA-h64f-5h5j-jqjh, GHSA-wfc6-r584-vfw7, GHSA-3g8h-86w9-wvmq,
+  #       GHSA-vfv6-92ff-j949) — defensive override; next is not a direct dependency
+  "next": ">=15.5.16"
