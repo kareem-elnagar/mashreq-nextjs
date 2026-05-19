@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowRight, Factory, ShieldCheck, Droplet, TrendingUp, Clock, Sun } from "lucide-react";
+import { ArrowRight, Factory, ShieldCheck, Droplet, TrendingUp, Clock, Sun, Download, FileText } from "lucide-react";
 
 export default function Home() {
   return (
@@ -158,6 +158,38 @@ export default function Home() {
                 <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── COMPANY PROFILE DOWNLOAD ─────────────────────────── */}
+      <section className="py-20 bg-white border-t border-slate-100">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 bg-blue-50 text-primary px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6">
+            <FileText size={13} />
+            Company Profile
+          </div>
+          <h2 className="text-3xl font-black text-[#1e4b8f] mb-3">Download Our Company Profile</h2>
+          <p className="text-slate-500 mb-10 max-w-md mx-auto">
+            Full engineering portfolio, project case studies, and system capabilities — available in English and Arabic.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/Material/cp mashre_En.pdf"
+              download
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-[#1e4b8f] text-white font-bold hover:bg-blue-800 transition-all shadow-lg shadow-blue-900/15 group"
+            >
+              <Download size={18} className="group-hover:-translate-y-0.5 transition-transform" />
+              Download — English
+            </a>
+            <a
+              href="/Material/cp mashreq Ar_organized.pdf"
+              download
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full border-2 border-[#1e4b8f] text-[#1e4b8f] font-bold hover:bg-blue-50 transition-all group"
+            >
+              <Download size={18} className="group-hover:-translate-y-0.5 transition-transform" />
+              تحميل — عربي
+            </a>
           </div>
         </div>
       </section>

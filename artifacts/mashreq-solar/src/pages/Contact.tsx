@@ -21,11 +21,11 @@ export default function ContactPage() {
             <div className="space-y-8">
               <div className="flex items-center space-x-6 bg-white/40 backdrop-blur-md p-6 rounded-[2rem] border border-white/60 shadow-xl shadow-blue-900/5">
                 <div className="bg-primary/10 p-4 rounded-2xl text-primary"><Mail size={24} /></div>
-                <div><h3 className="font-bold text-primary uppercase tracking-widest text-xs mb-1">Direct Email</h3><p className="text-gray-600">engineering@mashreqsolar.com</p></div>
+                <div><h3 className="font-bold text-primary uppercase tracking-widest text-xs mb-1">Direct Email</h3><p className="text-gray-600">kareem.elnagar@mashreqco.com</p></div>
               </div>
               <div className="flex items-center space-x-6 bg-white/40 backdrop-blur-md p-6 rounded-[2rem] border border-white/60 shadow-xl shadow-blue-900/5">
                 <div className="bg-primary/10 p-4 rounded-2xl text-primary"><Phone size={24} /></div>
-                <div><h3 className="font-bold text-primary uppercase tracking-widest text-xs mb-1">Office Support</h3><p className="text-gray-600">+20 123 456 7890</p></div>
+                <div><h3 className="font-bold text-primary uppercase tracking-widest text-xs mb-1">Phone / WhatsApp</h3><p className="text-gray-600">+20 10 23027143</p></div>
               </div>
             </div>
           </div>
