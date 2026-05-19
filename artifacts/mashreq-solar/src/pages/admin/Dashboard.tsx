@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import {
   LayoutDashboard, Zap, FolderOpen, LogOut,
   MapPin, Calendar, ChevronRight, Eye, EyeOff,
   TrendingUp, Sun, Shield, Pencil, X, RotateCcw, Save,
-  Plus, Trash2,
+  Plus, Trash2, ImageIcon, Upload,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useProjects } from "@/lib/projects-store";
@@ -22,9 +22,9 @@ const BLANK_PROJECT: Omit<Project, "slug"> = {
   image: "/img/projects/fahl/1.jpg",
   gallery: [],
   stats: [
-    { label: "Capacity", value: "" },
+    { label: "Capacity",    value: "" },
     { label: "System Type", value: "Hybrid" },
-    { label: "Key Metric", value: "" },
+    { label: "Key Metric",  value: "" },
   ],
   status: "",
   situation: "",
@@ -33,17 +33,30 @@ const BLANK_PROJECT: Omit<Project, "slug"> = {
   outcome: "",
 };
 
+interface SavePayload extends Partial<Project> {
+  slug?: string;
+  imageFile?: File;
+}
+
 function ProjectModal({
   project,
   isNew,
+  currentImageUrl,
+  hasCustomImage,
   onSave,
+  onRemoveImage,
   onClose,
 }: {
   project: Project | typeof BLANK_PROJECT;
   isNew: boolean;
-  onSave: (changes: Partial<Project> & { slug?: string }) => void;
+  currentImageUrl: string;
+  hasCustomImage: boolean;
+  onSave: (payload: SavePayload) => void;
+  onRemoveImage: () => void;
   onClose: () => void;
 }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [form, setForm] = useState({
     title:      (project as Project).title ?? "",
     client:     (project as Project).client ?? "",
@@ -59,10 +72,24 @@ function ProjectModal({
     system:     project.system,
     outcome:    project.outcome,
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl,   setPreviewUrl]   = useState<string | null>(null);
   const [error, setError] = useState("");
 
   function set(key: string, val: string) {
     setForm((f) => ({ ...f, [key]: val }));
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Image must be under 10 MB.");
+      return;
+    }
+    setError("");
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
   }
 
   function slugify(str: string) {
@@ -74,20 +101,20 @@ function ProjectModal({
   }
 
   function handleSave() {
-    if (!form.title.trim()) { setError("Title is required."); return; }
+    if (!form.title.trim())    { setError("Title is required.");    return; }
     if (!form.location.trim()) { setError("Location is required."); return; }
-    if (!form.size.trim()) { setError("Capacity is required."); return; }
+    if (!form.size.trim())     { setError("Capacity is required."); return; }
     setError("");
 
-    const changes: Partial<Project> & { slug?: string } = {
+    const payload: SavePayload = {
       title:     form.title,
       client:    form.client || undefined,
       location:  form.location,
       year:      form.year,
       size:      form.size,
       stats: [
-        { label: "Capacity",    value: form.size },
-        { label: "System Type", value: form.systemType },
+        { label: "Capacity",      value: form.size },
+        { label: "System Type",   value: form.systemType },
         { label: form.stat3Label, value: form.stat3Value },
       ],
       status:    form.status,
@@ -96,10 +123,13 @@ function ProjectModal({
       system:    form.system,
       outcome:   form.outcome,
     };
-    if (isNew) changes.slug = slugify(form.title) || `project-${Date.now()}`;
-    onSave(changes);
+    if (isNew) payload.slug = slugify(form.title) || `project-${Date.now()}`;
+    if (selectedFile) payload.imageFile = selectedFile;
+    onSave(payload);
     onClose();
   }
+
+  const displayImage = previewUrl ?? currentImageUrl;
 
   const field = (label: string, key: string, multiline = false, required = false) => (
     <div>
@@ -133,13 +163,14 @@ function ProjectModal({
         transition={{ type: "spring", damping: 28, stiffness: 260 }}
         className="w-full max-w-lg h-full bg-white shadow-2xl flex flex-col overflow-hidden"
       >
+        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50 shrink-0">
           <div>
             <h2 className="font-black text-gray-900 text-base">
               {isNew ? "Add New Project" : "Edit Project"}
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">
-              {isNew ? "Fill in the details below to add a new project." : (project as Project).title}
+            <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">
+              {isNew ? "Fill in the details below." : (project as Project).title}
             </p>
           </div>
           <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-200 text-gray-500 transition-colors">
@@ -147,7 +178,83 @@ function ProjectModal({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+
+          {/* ── Image section ── */}
+          <div>
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
+              Cover Photo
+            </label>
+            <div className="relative rounded-2xl overflow-hidden bg-gray-100 h-40 w-full mb-3">
+              {displayImage ? (
+                <img
+                  src={displayImage}
+                  alt="cover"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-300">
+                  <ImageIcon size={36} />
+                </div>
+              )}
+              {previewUrl && (
+                <span className="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full">
+                  New
+                </span>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 bg-[#1e4b8f]/10 hover:bg-[#1e4b8f]/20 text-[#1e4b8f] text-xs font-bold px-4 py-2.5 rounded-xl transition-colors"
+              >
+                <Upload size={13} />
+                {previewUrl ? "Change Photo" : "Upload Photo"}
+              </button>
+              {(hasCustomImage || previewUrl) && !previewUrl && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onRemoveImage();
+                    setPreviewUrl(null);
+                    setSelectedFile(null);
+                  }}
+                  className="flex items-center gap-2 text-red-400 hover:bg-red-50 text-xs font-bold px-4 py-2.5 rounded-xl transition-colors border border-red-200"
+                >
+                  <Trash2 size={13} /> Remove Custom Photo
+                </button>
+              )}
+              {previewUrl && (
+                <button
+                  type="button"
+                  onClick={() => { setPreviewUrl(null); setSelectedFile(null); }}
+                  className="flex items-center gap-2 text-gray-400 hover:bg-gray-100 text-xs font-bold px-4 py-2.5 rounded-xl transition-colors border border-gray-200"
+                >
+                  <X size={13} /> Cancel
+                </button>
+              )}
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            {selectedFile && (
+              <p className="text-[11px] text-gray-400 mt-1.5">
+                {selectedFile.name} · {(selectedFile.size / 1024).toFixed(0)} KB
+              </p>
+            )}
+          </div>
+
+          <div className="border-t border-gray-100" />
+
+          {/* ── Text fields ── */}
           {isNew && (
             <div className="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3 text-xs text-[#1e4b8f]">
               The project will appear on the public site immediately after saving.
@@ -155,26 +262,27 @@ function ProjectModal({
           )}
 
           <div className="grid grid-cols-2 gap-4">
-            {field("Title", "title", false, true)}
-            {field("Client", "client")}
-            {field("Location", "location", false, true)}
-            {field("Year", "year")}
-            {field("Capacity", "size", false, true)}
-            {field("System Type", "systemType")}
-            {field("3rd Stat Label", "stat3Label")}
-            {field("3rd Stat Value", "stat3Value")}
+            {field("Title",        "title",      false, true)}
+            {field("Client",       "client")}
+            {field("Location",     "location",   false, true)}
+            {field("Year",         "year")}
+            {field("Capacity",     "size",       false, true)}
+            {field("System Type",  "systemType")}
+            {field("3rd Stat Label","stat3Label")}
+            {field("3rd Stat Value","stat3Value")}
           </div>
-          {field("Status", "status")}
-          {field("Situation", "situation", true)}
-          {field("Decision", "decision", true)}
-          {field("System Description", "system", true)}
-          {field("Outcome", "outcome", true)}
+          {field("Status",              "status")}
+          {field("Situation",           "situation",  true)}
+          {field("Decision",            "decision",   true)}
+          {field("System Description",  "system",     true)}
+          {field("Outcome",             "outcome",    true)}
 
           {error && (
             <p className="text-xs text-red-500 font-semibold bg-red-50 px-4 py-2 rounded-xl">{error}</p>
           )}
         </div>
 
+        {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-3 shrink-0">
           <button
             onClick={handleSave}
@@ -196,10 +304,14 @@ function ProjectModal({
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
-  const { projects, updateProject, resetProject, addProject, deleteProject, isAdded } = useProjects();
+  const {
+    projects, updateProject, resetProject,
+    addProject, deleteProject, isAdded,
+    updateProjectImage, removeProjectImage, hasCustomImage,
+  } = useProjects();
   const [, navigate] = useLocation();
-  const [tab, setTab] = useState<Tab>("overview");
-  const [editingSlug, setEditingSlug] = useState<string | null>(null);
+  const [tab,          setTab]          = useState<Tab>("overview");
+  const [editingSlug,  setEditingSlug]  = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
   const isAdmin = user?.role === "admin";
@@ -220,7 +332,41 @@ export default function AdminDashboard() {
     navigate("/admin");
   }
 
-  const editingProject = editingSlug ? projects.find((p) => p.slug === editingSlug) ?? null : null;
+  async function handleSave(slug: string, payload: SavePayload) {
+    const { imageFile, slug: _s, ...changes } = payload;
+    updateProject(slug, changes);
+    if (imageFile) await updateProjectImage(slug, imageFile);
+  }
+
+  async function handleAdd(payload: SavePayload) {
+    const { imageFile, slug: newSlug, ...rest } = payload;
+    const slug = newSlug ?? `project-${Date.now()}`;
+    addProject({
+      slug,
+      title:     rest.title     ?? "",
+      client:    rest.client,
+      location:  rest.location  ?? "",
+      year:      rest.year      ?? new Date().getFullYear().toString(),
+      size:      rest.size      ?? "",
+      image:     "/img/projects/fahl/1.jpg",
+      gallery:   [],
+      stats:     rest.stats     ?? [
+        { label: "Capacity",    value: "" },
+        { label: "System Type", value: "Hybrid" },
+        { label: "Key Metric",  value: "" },
+      ],
+      status:    rest.status    ?? "",
+      situation: rest.situation ?? "",
+      decision:  rest.decision  ?? "",
+      system:    rest.system    ?? "",
+      outcome:   rest.outcome   ?? "",
+    });
+    if (imageFile) await updateProjectImage(slug, imageFile);
+  }
+
+  const editingProject = editingSlug
+    ? projects.find((p) => p.slug === editingSlug) ?? null
+    : null;
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -289,13 +435,15 @@ export default function AdminDashboard() {
               transition={{ duration: 0.25 }}
             >
               <h1 className="text-2xl font-black text-gray-900 mb-1">Overview</h1>
-              <p className="text-gray-400 text-sm mb-8">Live snapshot of all installed capacity and project activity.</p>
+              <p className="text-gray-400 text-sm mb-8">
+                Live snapshot of all installed capacity and project activity.
+              </p>
 
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-                <StatCard icon={<Zap size={20} />} label="Total Installed" value={`${TOTAL_KW.toFixed(1)} kW`} color="blue" />
-                <StatCard icon={<FolderOpen size={20} />} label="Projects" value={String(projects.length)} color="yellow" />
-                <StatCard icon={<TrendingUp size={20} />} label="Hybrid Systems" value={String(systemCounts["Hybrid"] ?? 0)} color="green" />
-                <StatCard icon={<Sun size={20} />} label="On-Grid Systems" value={String(systemCounts["On-Grid"] ?? 0)} color="orange" />
+                <StatCard icon={<Zap size={20} />}        label="Total Installed"  value={`${TOTAL_KW.toFixed(1)} kW`}           color="blue"   />
+                <StatCard icon={<FolderOpen size={20} />} label="Projects"         value={String(projects.length)}               color="yellow" />
+                <StatCard icon={<TrendingUp size={20} />} label="Hybrid Systems"   value={String(systemCounts["Hybrid"] ?? 0)}   color="green"  />
+                <StatCard icon={<Sun size={20} />}        label="On-Grid Systems"  value={String(systemCounts["On-Grid"] ?? 0)}  color="orange" />
               </div>
 
               <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 mb-6">
@@ -358,7 +506,7 @@ export default function AdminDashboard() {
               </div>
               <p className="text-gray-400 text-sm mb-8">
                 {isAdmin
-                  ? "Full project details. Add, edit, or remove any project."
+                  ? "Full project details. Add, edit photos, or remove any project."
                   : "Project overview — client details and editing are restricted to admin."}
               </p>
 
@@ -371,19 +519,25 @@ export default function AdminDashboard() {
                     transition={{ delay: i * 0.04 }}
                     className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden"
                   >
-                    <div className="flex items-center gap-0">
-                      <div className="w-28 h-24 shrink-0 overflow-hidden bg-gray-100">
+                    <div className="flex items-center">
+                      <div className="relative w-28 h-24 shrink-0 overflow-hidden bg-gray-100">
                         <img
                           src={p.image}
                           alt={p.title}
                           className="w-full h-full object-cover"
                           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                         />
+                        {hasCustomImage(p.slug) && (
+                          <div className="absolute bottom-1 left-1 bg-black/50 rounded-full px-1.5 py-0.5 flex items-center gap-1">
+                            <ImageIcon size={9} className="text-white" />
+                            <span className="text-[9px] text-white font-bold">Custom</span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1 px-5 py-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-bold text-gray-900 text-sm">{p.title}</h3>
                               {isAdded(p.slug) && (
                                 <span className="text-[9px] font-bold uppercase tracking-wider bg-green-100 text-green-600 px-2 py-0.5 rounded-full">
@@ -489,7 +643,10 @@ export default function AdminDashboard() {
             key={editingSlug!}
             project={editingProject}
             isNew={false}
-            onSave={(changes) => updateProject(editingProject.slug, changes)}
+            currentImageUrl={editingProject.image}
+            hasCustomImage={hasCustomImage(editingProject.slug)}
+            onSave={(payload) => handleSave(editingProject.slug, payload)}
+            onRemoveImage={() => removeProjectImage(editingProject.slug)}
             onClose={() => setEditingSlug(null)}
           />
         )}
@@ -502,29 +659,10 @@ export default function AdminDashboard() {
             key="new-project"
             project={{ ...BLANK_PROJECT, slug: "" } as Project}
             isNew={true}
-            onSave={(changes) => {
-              const slug = changes.slug ?? `project-${Date.now()}`;
-              addProject({
-                slug,
-                title:     changes.title ?? "",
-                client:    changes.client,
-                location:  changes.location ?? "",
-                year:      changes.year ?? new Date().getFullYear().toString(),
-                size:      changes.size ?? "",
-                image:     "/img/projects/fahl/1.jpg",
-                gallery:   [],
-                stats:     changes.stats ?? [
-                  { label: "Capacity", value: "" },
-                  { label: "System Type", value: "Hybrid" },
-                  { label: "Key Metric", value: "" },
-                ],
-                status:    changes.status ?? "",
-                situation: changes.situation ?? "",
-                decision:  changes.decision ?? "",
-                system:    changes.system ?? "",
-                outcome:   changes.outcome ?? "",
-              });
-            }}
+            currentImageUrl="/img/projects/fahl/1.jpg"
+            hasCustomImage={false}
+            onSave={handleAdd}
+            onRemoveImage={() => {}}
             onClose={() => setShowAddModal(false)}
           />
         )}

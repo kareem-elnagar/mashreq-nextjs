@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { projects as defaultProjects, Project } from "@/lib/data";
+import { saveImage, deleteImage, loadAllImageUrls } from "@/lib/image-store";
 
 const OVERRIDES_KEY = "mashreq_project_overrides";
 const ADDED_KEY     = "mashreq_project_added";
@@ -16,30 +17,46 @@ function loadAdded(): Project[] {
   catch { return []; }
 }
 
-function mergeProjects(defaults: Project[], overrides: Overrides, added: Project[]): Project[] {
-  const merged = defaults.map((p) =>
-    overrides[p.slug] ? { ...p, ...overrides[p.slug] } : p
+function mergeProjects(
+  defaults: Project[],
+  overrides: Overrides,
+  added: Project[],
+  imageUrls: Record<string, string>,
+): Project[] {
+  const merged = defaults.map((p) => {
+    const base = overrides[p.slug] ? { ...p, ...overrides[p.slug] } : p;
+    return imageUrls[p.slug] ? { ...base, image: imageUrls[p.slug] } : base;
+  });
+  const addedMerged = added.map((p) =>
+    imageUrls[p.slug] ? { ...p, image: imageUrls[p.slug] } : p
   );
-  return [...merged, ...added];
+  return [...merged, ...addedMerged];
 }
 
 interface ProjectsContextType {
-  projects: Project[];
-  updateProject: (slug: string, changes: Partial<Project>) => void;
-  resetProject:  (slug: string) => void;
-  addProject:    (p: Project) => void;
-  deleteProject: (slug: string) => void;
-  isAdded:       (slug: string) => boolean;
+  projects:           Project[];
+  updateProject:      (slug: string, changes: Partial<Project>) => void;
+  resetProject:       (slug: string) => void;
+  addProject:         (p: Project) => void;
+  deleteProject:      (slug: string) => void;
+  isAdded:            (slug: string) => boolean;
+  updateProjectImage: (slug: string, file: File) => Promise<void>;
+  removeProjectImage: (slug: string) => Promise<void>;
+  hasCustomImage:     (slug: string) => boolean;
 }
 
 const ProjectsContext = createContext<ProjectsContextType | null>(null);
 
 export function ProjectsProvider({ children }: { children: ReactNode }) {
-  const [overrides, setOverrides] = useState<Overrides>(loadOverrides);
-  const [added,     setAdded]     = useState<Project[]>(loadAdded);
+  const [overrides,  setOverrides]  = useState<Overrides>(loadOverrides);
+  const [added,      setAdded]      = useState<Project[]>(loadAdded);
+  const [imageUrls,  setImageUrls]  = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    loadAllImageUrls().then(setImageUrls).catch(() => {});
+  }, []);
 
   function updateProject(slug: string, changes: Partial<Project>) {
-    // Check if it's an added project first
     const isAddedProject = added.some((p) => p.slug === slug);
     if (isAddedProject) {
       setAdded((prev) => {
@@ -79,17 +96,43 @@ export function ProjectsProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(ADDED_KEY, JSON.stringify(next));
       return next;
     });
+    deleteImage(slug).catch(() => {});
+    setImageUrls((prev) => {
+      const next = { ...prev };
+      delete next[slug];
+      return next;
+    });
   }
 
   function isAdded(slug: string) {
     return added.some((p) => p.slug === slug);
   }
 
+  async function updateProjectImage(slug: string, file: File) {
+    await saveImage(slug, file);
+    const url = URL.createObjectURL(file);
+    setImageUrls((prev) => ({ ...prev, [slug]: url }));
+  }
+
+  async function removeProjectImage(slug: string) {
+    await deleteImage(slug);
+    setImageUrls((prev) => {
+      const next = { ...prev };
+      delete next[slug];
+      return next;
+    });
+  }
+
+  function hasCustomImage(slug: string) {
+    return !!imageUrls[slug];
+  }
+
   return (
     <ProjectsContext.Provider
       value={{
-        projects: mergeProjects(defaultProjects, overrides, added),
+        projects: mergeProjects(defaultProjects, overrides, added, imageUrls),
         updateProject, resetProject, addProject, deleteProject, isAdded,
+        updateProjectImage, removeProjectImage, hasCustomImage,
       }}
     >
       {children}
