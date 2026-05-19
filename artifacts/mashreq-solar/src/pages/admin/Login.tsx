@@ -43,7 +43,9 @@ export default function AdminLogin() {
       >
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
           <div className="flex flex-col items-center mb-8">
-            <img src="/img/Logo.png" alt="Mashreq" className="h-14 w-auto mb-4 drop-shadow-lg" />
+            <div className="bg-white rounded-2xl p-3 mb-4 shadow-lg">
+              <img src="/img/Logo.png" alt="Mashreq" className="h-12 w-auto" />
+            </div>
             <h1 className="text-white font-black text-2xl tracking-tight">Admin Portal</h1>
             <p className="text-white/50 text-sm mt-1">Restricted access — authorised personnel only</p>
           </div>

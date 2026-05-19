@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { ArrowLeft, CheckCircle2, AlertCircle, Info, Calendar, MapPin, Gauge, User, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { projects } from "@/lib/data";
+import { useProjects } from "@/lib/projects-store";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
 }
 
 export default function ProjectDetail({ slug }: Props) {
+  const { projects } = useProjects();
   const project = projects.find((p) => p.slug === slug);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 

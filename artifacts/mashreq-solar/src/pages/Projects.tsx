@@ -1,9 +1,10 @@
 import { Link } from "wouter";
 import { ArrowRight, MapPin, Calendar, Activity, User } from "lucide-react";
-import { projects } from "@/lib/data";
+import { useProjects } from "@/lib/projects-store";
 import { motion } from "framer-motion";
 
 export default function ProjectsPage() {
+  const { projects } = useProjects();
   return (
     <div className="bg-slate-50 min-h-screen relative overflow-hidden">
       <div className="smart-shape w-[400px] h-[400px] -top-20 -left-20" />

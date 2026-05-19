@@ -4,42 +4,180 @@ import { useLocation } from "wouter";
 import {
   LayoutDashboard, Zap, FolderOpen, LogOut,
   MapPin, Calendar, ChevronRight, Eye, EyeOff,
-  TrendingUp, Sun, Users, Shield,
+  TrendingUp, Sun, Shield, Pencil, X, RotateCcw, Save,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { projects } from "@/lib/data";
-
-const TOTAL_KW = projects
-  .map((p) => parseFloat(p.size))
-  .filter(Boolean)
-  .reduce((a, b) => a + b, 0);
-
-const systemCounts = projects.reduce<Record<string, number>>((acc, p) => {
-  const type = p.stats[1].value;
-  acc[type] = (acc[type] || 0) + 1;
-  return acc;
-}, {});
+import { useProjects } from "@/lib/projects-store";
+import { Project } from "@/lib/data";
 
 type Tab = "overview" | "projects";
 
+function EditModal({
+  project,
+  onSave,
+  onClose,
+}: {
+  project: Project;
+  onSave: (changes: Partial<Project>) => void;
+  onClose: () => void;
+}) {
+  const [form, setForm] = useState({
+    title: project.title,
+    client: project.client ?? "",
+    location: project.location,
+    year: project.year,
+    size: project.size,
+    systemType: project.stats[1].value,
+    stat3Label: project.stats[2].label,
+    stat3Value: project.stats[2].value,
+    status: project.status,
+    situation: project.situation,
+    decision: project.decision,
+    system: project.system,
+    outcome: project.outcome,
+  });
+
+  function set(key: string, val: string) {
+    setForm((f) => ({ ...f, [key]: val }));
+  }
+
+  function handleSave() {
+    onSave({
+      title: form.title,
+      client: form.client || undefined,
+      location: form.location,
+      year: form.year,
+      size: form.size,
+      stats: [
+        { label: "Capacity", value: form.size },
+        { label: "System Type", value: form.systemType },
+        { label: form.stat3Label, value: form.stat3Value },
+      ],
+      status: form.status,
+      situation: form.situation,
+      decision: form.decision,
+      system: form.system,
+      outcome: form.outcome,
+    });
+    onClose();
+  }
+
+  const field = (label: string, key: string, multiline = false) => (
+    <div>
+      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">{label}</label>
+      {multiline ? (
+        <textarea
+          rows={3}
+          value={(form as any)[key]}
+          onChange={(e) => set(key, e.target.value)}
+          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[#1e4b8f] resize-none"
+        />
+      ) : (
+        <input
+          type="text"
+          value={(form as any)[key]}
+          onChange={(e) => set(key, e.target.value)}
+          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[#1e4b8f]"
+        />
+      )}
+    </div>
+  );
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/40 backdrop-blur-sm">
+      <motion.div
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ type: "spring", damping: 28, stiffness: 260 }}
+        className="w-full max-w-lg h-full bg-white shadow-2xl flex flex-col overflow-hidden"
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50 shrink-0">
+          <div>
+            <h2 className="font-black text-gray-900 text-base">Edit Project</h2>
+            <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{project.title}</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-200 text-gray-500 transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            {field("Title", "title")}
+            {field("Client", "client")}
+            {field("Location", "location")}
+            {field("Year", "year")}
+            {field("Capacity (size)", "size")}
+            {field("System Type", "systemType")}
+            {field("3rd Stat Label", "stat3Label")}
+            {field("3rd Stat Value", "stat3Value")}
+          </div>
+          {field("Status", "status")}
+          {field("Situation", "situation", true)}
+          {field("Decision", "decision", true)}
+          {field("System", "system", true)}
+          {field("Outcome", "outcome", true)}
+        </div>
+
+        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-3 shrink-0">
+          <button
+            onClick={handleSave}
+            className="flex-1 flex items-center justify-center gap-2 bg-[#1e4b8f] hover:bg-[#163a74] text-white font-bold text-sm py-3 rounded-2xl transition-colors"
+          >
+            <Save size={15} /> Save Changes
+          </button>
+          <button
+            onClick={onClose}
+            className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-100 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
+  const { projects, updateProject, resetProject } = useProjects();
   const [, navigate] = useLocation();
   const [tab, setTab] = useState<Tab>("overview");
+  const [editingSlug, setEditingSlug] = useState<string | null>(null);
+
+  const isAdmin = user?.role === "admin";
+
+  const TOTAL_KW = projects
+    .map((p) => parseFloat(p.size))
+    .filter(Boolean)
+    .reduce((a, b) => a + b, 0);
+
+  const systemCounts = projects.reduce<Record<string, number>>((acc, p) => {
+    const type = p.stats[1].value;
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {});
 
   function handleLogout() {
     logout();
     navigate("/admin");
   }
 
-  const isAdmin = user?.role === "admin";
+  const editingProject = editingSlug ? projects.find((p) => p.slug === editingSlug) ?? null : null;
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
       <aside className="w-64 bg-[#0f2a5e] flex flex-col shrink-0 min-h-screen">
-        <div className="p-6 border-b border-white/10">
-          <img src="/img/Logo.png" alt="Mashreq" className="h-10 w-auto mb-1" />
-          <p className="text-white/40 text-xs mt-2 uppercase tracking-widest font-semibold">Admin Portal</p>
+        <div className="p-5 border-b border-white/10 flex items-center gap-3">
+          <div className="bg-white rounded-xl p-2 shrink-0">
+            <img src="/img/Logo.png" alt="Mashreq" className="h-8 w-auto" />
+          </div>
+          <div>
+            <p className="text-white font-black text-sm leading-tight">MASHREQ</p>
+            <p className="text-white/40 text-[10px] uppercase tracking-widest font-semibold">Admin Portal</p>
+          </div>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
@@ -60,19 +198,17 @@ export default function AdminDashboard() {
         </nav>
 
         <div className="p-4 border-t border-white/10 space-y-3">
-          <div className="bg-white/10 rounded-2xl px-4 py-3">
-            <div className="flex items-center gap-2">
-              {isAdmin ? (
-                <Shield size={14} className="text-[#ffce07]" />
-              ) : (
-                <Eye size={14} className="text-blue-300" />
-              )}
-              <div>
-                <p className="text-white text-xs font-bold">{user?.username}</p>
-                <p className="text-white/40 text-[10px] uppercase tracking-wider">
-                  {isAdmin ? "Full Admin" : "Viewer"}
-                </p>
-              </div>
+          <div className="bg-white/10 rounded-2xl px-4 py-3 flex items-center gap-2">
+            {isAdmin ? (
+              <Shield size={14} className="text-[#ffce07] shrink-0" />
+            ) : (
+              <Eye size={14} className="text-blue-300 shrink-0" />
+            )}
+            <div>
+              <p className="text-white text-xs font-bold">{user?.username}</p>
+              <p className="text-white/40 text-[10px] uppercase tracking-wider">
+                {isAdmin ? "Full Admin" : "Viewer"}
+              </p>
             </div>
           </div>
           <button
@@ -85,6 +221,7 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
+      {/* Main */}
       <main className="flex-1 overflow-y-auto p-8">
         <AnimatePresence mode="wait">
           {tab === "overview" && (
@@ -155,8 +292,8 @@ export default function AdminDashboard() {
               <h1 className="text-2xl font-black text-gray-900 mb-1">Projects</h1>
               <p className="text-gray-400 text-sm mb-8">
                 {isAdmin
-                  ? "Full project details including client information."
-                  : "Project overview — client details are restricted to admin."}
+                  ? "Full project details. Click Edit to modify any project."
+                  : "Project overview — client details and editing are restricted to admin."}
               </p>
 
               <div className="space-y-4">
@@ -170,15 +307,11 @@ export default function AdminDashboard() {
                   >
                     <div className="flex items-center gap-0">
                       <div className="w-28 h-24 shrink-0 overflow-hidden">
-                        <img
-                          src={p.image}
-                          alt={p.title}
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 px-5 py-4">
                         <div className="flex items-start justify-between gap-4">
-                          <div>
+                          <div className="flex-1 min-w-0">
                             <h3 className="font-bold text-gray-900 text-sm">{p.title}</h3>
                             <div className="flex items-center gap-3 mt-1 flex-wrap">
                               <span className="flex items-center gap-1 text-xs text-gray-400">
@@ -200,7 +333,7 @@ export default function AdminDashboard() {
                                 <span className="text-xs text-gray-700 font-semibold">
                                   Capacity: <span className="text-[#1e4b8f]">{p.size}</span>
                                 </span>
-                                <span className="text-xs text-gray-400 italic">{p.status}</span>
+                                <span className="text-xs text-gray-400 italic truncate max-w-xs">{p.status}</span>
                               </div>
                             ) : (
                               <div className="mt-2 flex items-center gap-2">
@@ -214,21 +347,42 @@ export default function AdminDashboard() {
                             )}
                           </div>
 
-                          <a
-                            href={`/projects/${p.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="shrink-0 flex items-center gap-1 text-xs text-[#1e4b8f] font-semibold hover:underline"
-                          >
-                            View <ChevronRight size={13} />
-                          </a>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {isAdmin && (
+                              <>
+                                <button
+                                  onClick={() => setEditingSlug(p.slug)}
+                                  className="flex items-center gap-1.5 text-xs bg-[#1e4b8f] hover:bg-[#163a74] text-white font-semibold px-3 py-1.5 rounded-xl transition-colors"
+                                >
+                                  <Pencil size={12} /> Edit
+                                </button>
+                                <button
+                                  onClick={() => resetProject(p.slug)}
+                                  title="Reset to default"
+                                  className="p-1.5 rounded-xl border border-gray-200 text-gray-400 hover:text-red-400 hover:border-red-200 transition-colors"
+                                >
+                                  <RotateCcw size={12} />
+                                </button>
+                              </>
+                            )}
+                            <a
+                              href={`/projects/${p.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-xs text-gray-400 hover:text-[#1e4b8f] font-semibold"
+                            >
+                              View <ChevronRight size={13} />
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     {isAdmin && (
                       <div className="border-t border-gray-50 bg-gray-50/50 px-5 py-3">
-                        <p className="text-xs text-gray-500"><span className="font-semibold text-gray-700">Outcome:</span> {p.outcome}</p>
+                        <p className="text-xs text-gray-500 line-clamp-2">
+                          <span className="font-semibold text-gray-700">Outcome:</span> {p.outcome}
+                        </p>
                       </div>
                     )}
                   </motion.div>
@@ -238,6 +392,18 @@ export default function AdminDashboard() {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Edit modal */}
+      <AnimatePresence>
+        {editingProject && (
+          <EditModal
+            key={editingSlug!}
+            project={editingProject}
+            onSave={(changes) => updateProject(editingProject.slug, changes)}
+            onClose={() => setEditingSlug(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

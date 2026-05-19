@@ -12,6 +12,7 @@ import ContactPage from "@/pages/Contact";
 import AdminLogin from "@/pages/admin/Login";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import { AuthProvider, useAuth } from "@/lib/auth";
+import { ProjectsProvider } from "@/lib/projects-store";
 
 const queryClient = new QueryClient();
 
@@ -71,9 +72,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
+          <ProjectsProvider>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+          </ProjectsProvider>
         </AuthProvider>
         <Toaster />
       </TooltipProvider>
