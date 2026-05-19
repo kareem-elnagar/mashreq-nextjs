@@ -5,6 +5,7 @@ import {
   LayoutDashboard, Zap, FolderOpen, LogOut,
   MapPin, Calendar, ChevronRight, Eye, EyeOff,
   TrendingUp, Sun, Shield, Pencil, X, RotateCcw, Save,
+  Plus, Trash2,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useProjects } from "@/lib/projects-store";
@@ -12,59 +13,99 @@ import { Project } from "@/lib/data";
 
 type Tab = "overview" | "projects";
 
-function EditModal({
+const BLANK_PROJECT: Omit<Project, "slug"> = {
+  title: "",
+  client: "",
+  location: "",
+  year: new Date().getFullYear().toString(),
+  size: "",
+  image: "/img/projects/fahl/1.jpg",
+  gallery: [],
+  stats: [
+    { label: "Capacity", value: "" },
+    { label: "System Type", value: "Hybrid" },
+    { label: "Key Metric", value: "" },
+  ],
+  status: "",
+  situation: "",
+  decision: "",
+  system: "",
+  outcome: "",
+};
+
+function ProjectModal({
   project,
+  isNew,
   onSave,
   onClose,
 }: {
-  project: Project;
-  onSave: (changes: Partial<Project>) => void;
+  project: Project | typeof BLANK_PROJECT;
+  isNew: boolean;
+  onSave: (changes: Partial<Project> & { slug?: string }) => void;
   onClose: () => void;
 }) {
   const [form, setForm] = useState({
-    title: project.title,
-    client: project.client ?? "",
-    location: project.location,
-    year: project.year,
-    size: project.size,
+    title:      (project as Project).title ?? "",
+    client:     (project as Project).client ?? "",
+    location:   project.location,
+    year:       project.year,
+    size:       project.size,
     systemType: project.stats[1].value,
     stat3Label: project.stats[2].label,
     stat3Value: project.stats[2].value,
-    status: project.status,
-    situation: project.situation,
-    decision: project.decision,
-    system: project.system,
-    outcome: project.outcome,
+    status:     project.status,
+    situation:  project.situation,
+    decision:   project.decision,
+    system:     project.system,
+    outcome:    project.outcome,
   });
+  const [error, setError] = useState("");
 
   function set(key: string, val: string) {
     setForm((f) => ({ ...f, [key]: val }));
   }
 
+  function slugify(str: string) {
+    return str
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-");
+  }
+
   function handleSave() {
-    onSave({
-      title: form.title,
-      client: form.client || undefined,
-      location: form.location,
-      year: form.year,
-      size: form.size,
+    if (!form.title.trim()) { setError("Title is required."); return; }
+    if (!form.location.trim()) { setError("Location is required."); return; }
+    if (!form.size.trim()) { setError("Capacity is required."); return; }
+    setError("");
+
+    const changes: Partial<Project> & { slug?: string } = {
+      title:     form.title,
+      client:    form.client || undefined,
+      location:  form.location,
+      year:      form.year,
+      size:      form.size,
       stats: [
-        { label: "Capacity", value: form.size },
+        { label: "Capacity",    value: form.size },
         { label: "System Type", value: form.systemType },
         { label: form.stat3Label, value: form.stat3Value },
       ],
-      status: form.status,
+      status:    form.status,
       situation: form.situation,
-      decision: form.decision,
-      system: form.system,
-      outcome: form.outcome,
-    });
+      decision:  form.decision,
+      system:    form.system,
+      outcome:   form.outcome,
+    };
+    if (isNew) changes.slug = slugify(form.title) || `project-${Date.now()}`;
+    onSave(changes);
     onClose();
   }
 
-  const field = (label: string, key: string, multiline = false) => (
+  const field = (label: string, key: string, multiline = false, required = false) => (
     <div>
-      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">{label}</label>
+      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
+        {label}{required && <span className="text-red-400 ml-0.5">*</span>}
+      </label>
       {multiline ? (
         <textarea
           rows={3}
@@ -94,8 +135,12 @@ function EditModal({
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50 shrink-0">
           <div>
-            <h2 className="font-black text-gray-900 text-base">Edit Project</h2>
-            <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{project.title}</p>
+            <h2 className="font-black text-gray-900 text-base">
+              {isNew ? "Add New Project" : "Edit Project"}
+            </h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {isNew ? "Fill in the details below to add a new project." : (project as Project).title}
+            </p>
           </div>
           <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-200 text-gray-500 transition-colors">
             <X size={18} />
@@ -103,12 +148,18 @@ function EditModal({
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+          {isNew && (
+            <div className="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3 text-xs text-[#1e4b8f]">
+              The project will appear on the public site immediately after saving.
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
-            {field("Title", "title")}
+            {field("Title", "title", false, true)}
             {field("Client", "client")}
-            {field("Location", "location")}
+            {field("Location", "location", false, true)}
             {field("Year", "year")}
-            {field("Capacity (size)", "size")}
+            {field("Capacity", "size", false, true)}
             {field("System Type", "systemType")}
             {field("3rd Stat Label", "stat3Label")}
             {field("3rd Stat Value", "stat3Value")}
@@ -116,8 +167,12 @@ function EditModal({
           {field("Status", "status")}
           {field("Situation", "situation", true)}
           {field("Decision", "decision", true)}
-          {field("System", "system", true)}
+          {field("System Description", "system", true)}
           {field("Outcome", "outcome", true)}
+
+          {error && (
+            <p className="text-xs text-red-500 font-semibold bg-red-50 px-4 py-2 rounded-xl">{error}</p>
+          )}
         </div>
 
         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-3 shrink-0">
@@ -125,7 +180,7 @@ function EditModal({
             onClick={handleSave}
             className="flex-1 flex items-center justify-center gap-2 bg-[#1e4b8f] hover:bg-[#163a74] text-white font-bold text-sm py-3 rounded-2xl transition-colors"
           >
-            <Save size={15} /> Save Changes
+            {isNew ? <><Plus size={15} /> Add Project</> : <><Save size={15} /> Save Changes</>}
           </button>
           <button
             onClick={onClose}
@@ -141,10 +196,11 @@ function EditModal({
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
-  const { projects, updateProject, resetProject } = useProjects();
+  const { projects, updateProject, resetProject, addProject, deleteProject, isAdded } = useProjects();
   const [, navigate] = useLocation();
   const [tab, setTab] = useState<Tab>("overview");
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const isAdmin = user?.role === "admin";
 
@@ -289,10 +345,20 @@ export default function AdminDashboard() {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25 }}
             >
-              <h1 className="text-2xl font-black text-gray-900 mb-1">Projects</h1>
+              <div className="flex items-center justify-between mb-1">
+                <h1 className="text-2xl font-black text-gray-900">Projects</h1>
+                {isAdmin && (
+                  <button
+                    onClick={() => setShowAddModal(true)}
+                    className="flex items-center gap-2 bg-[#1e4b8f] hover:bg-[#163a74] text-white font-bold text-sm px-4 py-2.5 rounded-2xl transition-colors"
+                  >
+                    <Plus size={15} /> Add Project
+                  </button>
+                )}
+              </div>
               <p className="text-gray-400 text-sm mb-8">
                 {isAdmin
-                  ? "Full project details. Click Edit to modify any project."
+                  ? "Full project details. Add, edit, or remove any project."
                   : "Project overview — client details and editing are restricted to admin."}
               </p>
 
@@ -302,17 +368,29 @@ export default function AdminDashboard() {
                     key={p.slug}
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                    transition={{ delay: i * 0.04 }}
                     className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden"
                   >
                     <div className="flex items-center gap-0">
-                      <div className="w-28 h-24 shrink-0 overflow-hidden">
-                        <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                      <div className="w-28 h-24 shrink-0 overflow-hidden bg-gray-100">
+                        <img
+                          src={p.image}
+                          alt={p.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                        />
                       </div>
                       <div className="flex-1 px-5 py-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-gray-900 text-sm">{p.title}</h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-bold text-gray-900 text-sm">{p.title}</h3>
+                              {isAdded(p.slug) && (
+                                <span className="text-[9px] font-bold uppercase tracking-wider bg-green-100 text-green-600 px-2 py-0.5 rounded-full">
+                                  New
+                                </span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-3 mt-1 flex-wrap">
                               <span className="flex items-center gap-1 text-xs text-gray-400">
                                 <MapPin size={11} /> {p.location}
@@ -356,13 +434,23 @@ export default function AdminDashboard() {
                                 >
                                   <Pencil size={12} /> Edit
                                 </button>
-                                <button
-                                  onClick={() => resetProject(p.slug)}
-                                  title="Reset to default"
-                                  className="p-1.5 rounded-xl border border-gray-200 text-gray-400 hover:text-red-400 hover:border-red-200 transition-colors"
-                                >
-                                  <RotateCcw size={12} />
-                                </button>
+                                {isAdded(p.slug) ? (
+                                  <button
+                                    onClick={() => deleteProject(p.slug)}
+                                    title="Delete project"
+                                    className="p-1.5 rounded-xl border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors"
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => resetProject(p.slug)}
+                                    title="Reset to default"
+                                    className="p-1.5 rounded-xl border border-gray-200 text-gray-400 hover:text-amber-500 hover:border-amber-200 transition-colors"
+                                  >
+                                    <RotateCcw size={12} />
+                                  </button>
+                                )}
                               </>
                             )}
                             <a
@@ -381,7 +469,8 @@ export default function AdminDashboard() {
                     {isAdmin && (
                       <div className="border-t border-gray-50 bg-gray-50/50 px-5 py-3">
                         <p className="text-xs text-gray-500 line-clamp-2">
-                          <span className="font-semibold text-gray-700">Outcome:</span> {p.outcome}
+                          <span className="font-semibold text-gray-700">Outcome:</span>{" "}
+                          {p.outcome || <span className="italic text-gray-300">No outcome set yet.</span>}
                         </p>
                       </div>
                     )}
@@ -396,11 +485,47 @@ export default function AdminDashboard() {
       {/* Edit modal */}
       <AnimatePresence>
         {editingProject && (
-          <EditModal
+          <ProjectModal
             key={editingSlug!}
             project={editingProject}
+            isNew={false}
             onSave={(changes) => updateProject(editingProject.slug, changes)}
             onClose={() => setEditingSlug(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Add modal */}
+      <AnimatePresence>
+        {showAddModal && (
+          <ProjectModal
+            key="new-project"
+            project={{ ...BLANK_PROJECT, slug: "" } as Project}
+            isNew={true}
+            onSave={(changes) => {
+              const slug = changes.slug ?? `project-${Date.now()}`;
+              addProject({
+                slug,
+                title:     changes.title ?? "",
+                client:    changes.client,
+                location:  changes.location ?? "",
+                year:      changes.year ?? new Date().getFullYear().toString(),
+                size:      changes.size ?? "",
+                image:     "/img/projects/fahl/1.jpg",
+                gallery:   [],
+                stats:     changes.stats ?? [
+                  { label: "Capacity", value: "" },
+                  { label: "System Type", value: "Hybrid" },
+                  { label: "Key Metric", value: "" },
+                ],
+                status:    changes.status ?? "",
+                situation: changes.situation ?? "",
+                decision:  changes.decision ?? "",
+                system:    changes.system ?? "",
+                outcome:   changes.outcome ?? "",
+              });
+            }}
+            onClose={() => setShowAddModal(false)}
           />
         )}
       </AnimatePresence>
