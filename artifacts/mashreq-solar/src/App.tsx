@@ -8,11 +8,13 @@ import Home from "@/pages/Home";
 import ProjectsPage from "@/pages/Projects";
 import ProjectDetail from "@/pages/ProjectDetail";
 import SystemsPage from "@/pages/Systems";
+import TestimonialsPage from "@/pages/Testimonials";
 import ContactPage from "@/pages/Contact";
 import AdminLogin from "@/pages/admin/Login";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { ProjectsProvider } from "@/lib/projects-store";
+import { TestimonialsProvider } from "@/lib/testimonials-store";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +47,7 @@ function Router() {
               {(params) => <ProjectDetail slug={params.slug} />}
             </Route>
             <Route path="/systems" component={SystemsPage} />
+            <Route path="/testimonials" component={TestimonialsPage} />
             <Route path="/contact" component={ContactPage} />
             <Route component={NotFound} />
           </Switch>
@@ -73,9 +76,11 @@ function App() {
       <TooltipProvider>
         <AuthProvider>
           <ProjectsProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <Router />
-            </WouterRouter>
+            <TestimonialsProvider>
+              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <Router />
+              </WouterRouter>
+            </TestimonialsProvider>
           </ProjectsProvider>
         </AuthProvider>
         <Toaster />

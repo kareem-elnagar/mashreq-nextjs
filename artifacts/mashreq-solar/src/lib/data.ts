@@ -169,3 +169,40 @@ export const systems: SystemType[] = [
     image: "/img/system-hybrid.png"
   }
 ];
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  content: string;
+  image?: string;
+  projectSlug?: string;
+}
+
+export const defaultTestimonials: Testimonial[] = [
+  {
+    id: "1",
+    name: "Eng. Mohamed Essam",
+    role: "Managing Director",
+    company: "Art Land Farm",
+    content: "We recovered our full investment in the 150 kW solar pumping system in under 30 months. The transition away from volatile diesel costs allowed us to stabilize our operating budget for our 240-feddan plantation in West Minya.",
+    projectSlug: "art-land-farm-west-minya"
+  },
+  {
+    id: "2",
+    name: "El Hajj Ziad El Fahl",
+    role: "Owner",
+    company: "El Fahl Agricultural Group",
+    content: "Mashreq Solar's hybrid controller changed how we irrigate. We no longer worry about grid power outages or rising fuel prices. The system defaults to solar during the day and seamlessly switches to the grid when needed.",
+    projectSlug: "ismailia-project-solar-pumping"
+  },
+  {
+    id: "3",
+    name: "Eng. Yasser Abdel Rahman",
+    role: "Operations Lead",
+    company: "Yathreb Farm",
+    content: "Our poultry units and irrigation systems consume huge amounts of power. Saving EGP 600,000 annually with the 144 kW net-metering solar arrays has exceeded our expectations. The engineering and integration were spotless.",
+    projectSlug: "yathreb-farm-beheira"
+  }
+];

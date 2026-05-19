@@ -5,13 +5,14 @@ import {
   LayoutDashboard, Zap, FolderOpen, LogOut,
   MapPin, Calendar, ChevronRight, Eye, EyeOff,
   TrendingUp, Sun, Shield, Pencil, X, RotateCcw, Save,
-  Plus, Trash2, ImageIcon, Upload, Images,
+  Plus, Trash2, ImageIcon, Upload, Images, Quote,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useProjects, GalleryItem } from "@/lib/projects-store";
-import { Project } from "@/lib/data";
+import { useTestimonials } from "@/lib/testimonials-store";
+import { Project, Testimonial } from "@/lib/data";
 
-type Tab = "overview" | "projects";
+type Tab = "overview" | "projects" | "testimonials";
 
 const BLANK_PROJECT: Omit<Project, "slug"> = {
   title: "", client: "", location: "",
@@ -25,9 +26,40 @@ const BLANK_PROJECT: Omit<Project, "slug"> = {
   status: "", situation: "", decision: "", system: "", outcome: "",
 };
 
+const BLANK_TESTIMONIAL: Omit<Testimonial, "id"> = {
+  name: "", role: "", company: "", content: "", projectSlug: "",
+};
+
 interface SavePayload extends Partial<Project> {
   slug?: string;
   imageFile?: File;
+}
+
+interface TestimonialSavePayload extends Partial<Testimonial> {
+  id?: string;
+  imageFile?: File;
+}
+
+// Helper to get consistent gradient based on name initials
+function getAvatarGradient(name: string) {
+  const code = name.charCodeAt(0) + (name.charCodeAt(1) || 0);
+  const gradients = [
+    "linear-gradient(135deg, #1e4b8f, #60a5fa)",
+    "linear-gradient(135deg, #1e4b8f, #ffce07)",
+    "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+    "linear-gradient(135deg, #10b981, #059669)",
+    "linear-gradient(135deg, #f59e0b, #d97706)",
+  ];
+  return gradients[code % gradients.length];
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
 }
 
 // ── Gallery section (immediate saves — no need to hit "Save Changes") ─────────
@@ -325,6 +357,203 @@ function ProjectModal({
   );
 }
 
+// ── Testimonial modal (edit + add) ───────────────────────────────────────────
+function TestimonialModal({
+  testimonial, isNew, currentImageUrl, hasCustomImage, projects,
+  onSave, onRemoveImage, onClose,
+}: {
+  testimonial: Testimonial | typeof BLANK_TESTIMONIAL;
+  isNew: boolean;
+  currentImageUrl?: string;
+  hasCustomImage: boolean;
+  projects: Project[];
+  onSave:         (payload: TestimonialSavePayload) => void;
+  onRemoveImage:  () => void;
+  onClose:        () => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [form, setForm] = useState({
+    name:        testimonial.name,
+    role:        testimonial.role,
+    company:     testimonial.company ?? "",
+    content:     testimonial.content,
+    projectSlug: testimonial.projectSlug ?? "",
+  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl,   setPreviewUrl]   = useState<string | null>(null);
+  const [error,        setError]        = useState("");
+
+  function set(key: string, val: string) { setForm((f) => ({ ...f, [key]: val })); }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { setError("Image must be under 10 MB."); return; }
+    setError("");
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  }
+
+  function handleSave() {
+    if (!form.name.trim())    { setError("Name is required.");    return; }
+    if (!form.role.trim())    { setError("Role is required.");    return; }
+    if (!form.content.trim()) { setError("Testimonial text is required."); return; }
+    setError("");
+
+    const payload: TestimonialSavePayload = {
+      name: form.name,
+      role: form.role,
+      company: form.company || undefined,
+      content: form.content,
+      projectSlug: form.projectSlug || undefined,
+    };
+    if (selectedFile) payload.imageFile = selectedFile;
+    onSave(payload);
+    onClose();
+  }
+
+  const displayImage = previewUrl ?? currentImageUrl;
+  const initials = getInitials(form.name || "T");
+  const gradient = getAvatarGradient(form.name || "T");
+
+  const field = (label: string, key: string, multiline = false, required = false) => (
+    <div>
+      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
+        {label}{required && <span className="text-red-400 ml-0.5">*</span>}
+      </label>
+      {multiline ? (
+        <textarea rows={4} value={(form as any)[key]} onChange={(e) => set(key, e.target.value)}
+          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[#1e4b8f] resize-none" />
+      ) : (
+        <input type="text" value={(form as any)[key]} onChange={(e) => set(key, e.target.value)}
+          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[#1e4b8f]" />
+      )}
+    </div>
+  );
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/40 backdrop-blur-sm">
+      <motion.div
+        initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
+        transition={{ type: "spring", damping: 28, stiffness: 260 }}
+        className="w-full max-w-lg h-full bg-white shadow-2xl flex flex-col overflow-hidden"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50 shrink-0">
+          <div>
+            <h2 className="font-black text-gray-900 text-base">
+              {isNew ? "Add New Testimonial" : "Edit Testimonial"}
+            </h2>
+            <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">
+              {isNew ? "Share client field feedback." : form.name}
+            </p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-200 text-gray-500 transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+          {/* Avatar Photo */}
+          <div>
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
+              Avatar Image
+            </label>
+            <div className="flex items-center space-x-4">
+              <div className="relative rounded-full overflow-hidden bg-gray-100 h-20 w-20 flex-shrink-0 flex items-center justify-center border border-gray-200">
+                {displayImage ? (
+                  <img src={displayImage} alt="avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div
+                    className="w-full h-full text-white font-bold text-xl items-center justify-center flex"
+                    style={{ background: gradient }}
+                  >
+                    {initials}
+                  </div>
+                )}
+                {previewUrl && (
+                  <span className="absolute bottom-0 right-0 bg-green-500 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full border border-white">New</span>
+                )}
+              </div>
+              <div>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-1.5 bg-[#1e4b8f]/10 hover:bg-[#1e4b8f]/20 text-[#1e4b8f] text-xs font-bold px-3.5 py-2 rounded-xl transition-colors">
+                    <Upload size={12} /> Upload Photo
+                  </button>
+                  {hasCustomImage && !previewUrl && (
+                    <button type="button" onClick={() => { onRemoveImage(); setPreviewUrl(null); setSelectedFile(null); }}
+                      className="flex items-center gap-1.5 text-red-400 hover:bg-red-50 text-xs font-bold px-3.5 py-2 rounded-xl border border-red-200 transition-colors">
+                      <Trash2 size={12} /> Remove
+                    </button>
+                  )}
+                  {previewUrl && (
+                    <button type="button" onClick={() => { setPreviewUrl(null); setSelectedFile(null); }}
+                      className="flex items-center gap-1.5 text-gray-400 hover:bg-gray-100 text-xs font-bold px-3.5 py-2 rounded-xl border border-gray-200 transition-colors">
+                      <X size={12} /> Cancel
+                    </button>
+                  )}
+                </div>
+                <p className="text-[10px] text-gray-400 mt-1.5">PNG, JPG under 10MB. Falling back to initials with dynamic gradients if empty.</p>
+              </div>
+            </div>
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+          </div>
+
+          <div className="border-t border-gray-100" />
+
+          {/* Fields */}
+          <div className="space-y-4">
+            {field("Client Name", "name", false, true)}
+            <div className="grid grid-cols-2 gap-4">
+              {field("Role / Title", "role", false, true)}
+              {field("Company / Farm", "company")}
+            </div>
+            
+            {/* Associated Project */}
+            <div>
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
+                Associated Project / Case Study
+              </label>
+              <select
+                value={form.projectSlug}
+                onChange={(e) => set("projectSlug", e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:border-[#1e4b8f] bg-white"
+              >
+                <option value="">-- None (No Case Study Link) --</option>
+                {projects.map((p) => (
+                  <option key={p.slug} value={p.slug}>
+                    {p.title} ({p.location})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {field("Testimonial Quote", "content", true, true)}
+          </div>
+
+          {error && (
+            <p className="text-xs text-red-500 font-semibold bg-red-50 px-4 py-2 rounded-xl">{error}</p>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-3 shrink-0">
+          <button onClick={handleSave}
+            className="flex-1 flex items-center justify-center gap-2 bg-[#1e4b8f] hover:bg-[#163a74] text-white font-bold text-sm py-3 rounded-2xl transition-colors">
+            {isNew ? <><Plus size={15} /> Add Testimonial</> : <><Save size={15} /> Save Changes</>}
+          </button>
+          <button onClick={onClose}
+            className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-100 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 // ── Main dashboard ────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -333,10 +562,22 @@ export default function AdminDashboard() {
     addProject, deleteProject, isAdded,
     updateProjectImage, removeProjectImage, hasCustomImage,
   } = useProjects();
+  const {
+    testimonials, addTestimonial, updateTestimonial,
+    deleteTestimonial, updateTestimonialImage, removeTestimonialImage,
+    isAdded: isTestimonialAdded
+  } = useTestimonials();
+  
   const [, navigate]     = useLocation();
   const [tab,            setTab]          = useState<Tab>("overview");
+  
+  // Projects states
   const [editingSlug,    setEditingSlug]  = useState<string | null>(null);
   const [showAddModal,   setShowAddModal] = useState(false);
+
+  // Testimonials states
+  const [editingTestiId, setEditingTestiId] = useState<string | null>(null);
+  const [showAddTestiModal, setShowAddTestiModal] = useState(false);
 
   const isAdmin = user?.role === "admin";
 
@@ -347,6 +588,7 @@ export default function AdminDashboard() {
 
   function handleLogout() { logout(); navigate("/admin"); }
 
+  // Project handlers
   async function handleSave(slug: string, payload: SavePayload) {
     const { imageFile, slug: _s, ...changes } = payload;
     updateProject(slug, changes);
@@ -370,7 +612,29 @@ export default function AdminDashboard() {
     if (imageFile) await updateProjectImage(slug, imageFile);
   }
 
+  // Testimonial handlers
+  async function handleTestimonialSave(id: string, payload: TestimonialSavePayload) {
+    const { imageFile, ...changes } = payload;
+    updateTestimonial(id, changes);
+    if (imageFile) await updateTestimonialImage(id, imageFile);
+  }
+
+  async function handleTestimonialAdd(payload: TestimonialSavePayload) {
+    const { imageFile, ...rest } = payload;
+    const newId = `testimonial-${Date.now()}`;
+    addTestimonial({
+      id: newId,
+      name: rest.name ?? "",
+      role: rest.role ?? "",
+      company: rest.company ?? "",
+      content: rest.content ?? "",
+      projectSlug: rest.projectSlug || undefined,
+    });
+    if (imageFile) await updateTestimonialImage(newId, imageFile);
+  }
+
   const editingProject = editingSlug ? projects.find((p) => p.slug === editingSlug) ?? null : null;
+  const editingTestimonial = editingTestiId ? testimonials.find((t) => t.id === editingTestiId) ?? null : null;
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -386,12 +650,12 @@ export default function AdminDashboard() {
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-1">
-          {(["overview", "projects"] as Tab[]).map((t) => (
+          {(["overview", "projects", "testimonials"] as Tab[]).map((t) => (
             <button key={t} onClick={() => setTab(t)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
                 tab === t ? "bg-[#ffce07] text-[#0f2a5e]" : "text-white/60 hover:text-white hover:bg-white/10"}`}>
-              {t === "overview" ? <LayoutDashboard size={16} /> : <FolderOpen size={16} />}
-              {t === "overview" ? "Overview" : "Projects"}
+              {t === "overview" ? <LayoutDashboard size={16} /> : t === "projects" ? <FolderOpen size={16} /> : <Quote size={16} />}
+              {t === "overview" ? "Overview" : t === "projects" ? "Projects" : "Testimonials"}
             </button>
           ))}
         </nav>
@@ -423,7 +687,7 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 <StatCard icon={<Zap size={20} />}        label="Total Installed" value={`${TOTAL_KW.toFixed(1)} kW`}          color="blue"   />
                 <StatCard icon={<FolderOpen size={20} />} label="Projects"        value={String(projects.length)}              color="yellow" />
-                <StatCard icon={<TrendingUp size={20} />} label="Hybrid Systems"  value={String(systemCounts["Hybrid"] ?? 0)}  color="green"  />
+                <StatCard icon={<Quote size={20} />}      label="Testimonials"    value={String(testimonials.length)}          color="green"  />
                 <StatCard icon={<Sun size={20} />}        label="On-Grid Systems" value={String(systemCounts["On-Grid"] ?? 0)} color="orange" />
               </div>
               <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 mb-6">
@@ -552,7 +816,7 @@ export default function AdminDashboard() {
                     {isAdmin && (
                       <div className="border-t border-gray-50 bg-gray-50/50 px-5 py-3">
                         <p className="text-xs text-gray-500 line-clamp-2">
-                          <span className="font-semibold text-gray-700">Outcome:</span>{" "}
+                           <span className="font-semibold text-gray-700">Outcome:</span>{" "}
                           {p.outcome || <span className="italic text-gray-300">No outcome set yet.</span>}
                         </p>
                       </div>
@@ -562,10 +826,100 @@ export default function AdminDashboard() {
               </div>
             </motion.div>
           )}
+
+          {tab === "testimonials" && (
+            <motion.div key="testimonials" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
+              <div className="flex items-center justify-between mb-1">
+                <h1 className="text-2xl font-black text-gray-900">Testimonials</h1>
+                {isAdmin && (
+                  <button onClick={() => setShowAddTestiModal(true)}
+                    className="flex items-center gap-2 bg-[#1e4b8f] hover:bg-[#163a74] text-white font-bold text-sm px-4 py-2.5 rounded-2xl transition-colors">
+                    <Plus size={15} /> Add Testimonial
+                  </button>
+                )}
+              </div>
+              <p className="text-gray-400 text-sm mb-8">
+                {isAdmin ? "Manage client field feedback. Add new feedback, upload avatars, edit quotes, or delete testimonials."
+                         : "Client feedback overview — editing and managing testimonials are restricted to admin."}
+              </p>
+              
+              <div className="space-y-4">
+                {testimonials.map((t, i) => {
+                  const gradient = getAvatarGradient(t.name);
+                  const initials = getInitials(t.name);
+                  const associatedProject = t.projectSlug ? projects.find((p) => p.slug === t.projectSlug) : null;
+
+                  return (
+                    <motion.div key={t.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.04 }}
+                      className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex items-start gap-4">
+                      
+                      {/* Avatar box */}
+                      <div className="relative rounded-full overflow-hidden bg-gray-100 h-14 w-14 shrink-0 flex items-center justify-center border border-gray-100">
+                        {t.image ? (
+                          <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div
+                            className="w-full h-full text-white font-bold text-sm items-center justify-center flex"
+                            style={{ background: gradient }}
+                          >
+                            {initials}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="font-bold text-gray-900 text-sm">{t.name}</h3>
+                              {isTestimonialAdded(t.id) && (
+                                <span className="text-[9px] font-bold uppercase tracking-wider bg-green-100 text-green-600 px-2 py-0.5 rounded-full">Added</span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 font-medium">
+                              {t.role}
+                              {t.company ? <span className="text-primary ml-1">· {t.company}</span> : null}
+                            </p>
+                            
+                            {associatedProject && (
+                              <div className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-[#1e4b8f] bg-blue-50 px-2.5 py-0.5 rounded-lg border border-blue-100/50">
+                                <Zap size={10} /> Linked: {associatedProject.title}
+                              </div>
+                            )}
+
+                            <p className="mt-3 text-sm text-gray-600 italic leading-relaxed">
+                              "{t.content}"
+                            </p>
+                          </div>
+
+                          {/* Actions */}
+                          {isAdmin && (
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button onClick={() => setEditingTestiId(t.id)}
+                                className="flex items-center gap-1.5 text-xs bg-[#1e4b8f] hover:bg-[#163a74] text-white font-semibold px-3 py-1.5 rounded-xl transition-colors">
+                                <Pencil size={12} /> Edit
+                              </button>
+                              <button onClick={() => deleteTestimonial(t.id)} title="Delete testimonial"
+                                className="p-1.5 rounded-xl border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors">
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </main>
 
-      {/* Edit modal */}
+      {/* Edit Project modal */}
       <AnimatePresence>
         {editingProject && (
           <ProjectModal key={editingSlug!} project={editingProject} isNew={false}
@@ -576,12 +930,46 @@ export default function AdminDashboard() {
         )}
       </AnimatePresence>
 
-      {/* Add modal */}
+      {/* Add Project modal */}
       <AnimatePresence>
         {showAddModal && (
           <ProjectModal key="new-project" project={{ ...BLANK_PROJECT, slug: "" } as Project}
             isNew={true} currentImageUrl="/img/projects/fahl/1.jpg" hasCustomImage={false}
             onSave={handleAdd} onRemoveImage={() => {}} onClose={() => setShowAddModal(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* Edit Testimonial Modal */}
+      <AnimatePresence>
+        {editingTestimonial && (
+          <TestimonialModal
+            key={editingTestiId!}
+            testimonial={editingTestimonial}
+            isNew={false}
+            currentImageUrl={editingTestimonial.image}
+            hasCustomImage={!!editingTestimonial.image && !editingTestimonial.image.startsWith("/img/")}
+            projects={projects}
+            onSave={(payload) => handleTestimonialSave(editingTestimonial.id, payload)}
+            onRemoveImage={() => removeTestimonialImage(editingTestimonial.id)}
+            onClose={() => setEditingTestiId(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Add Testimonial Modal */}
+      <AnimatePresence>
+        {showAddTestiModal && (
+          <TestimonialModal
+            key="new-testimonial"
+            testimonial={{ ...BLANK_TESTIMONIAL, id: "" } as Testimonial}
+            isNew={true}
+            currentImageUrl={undefined}
+            hasCustomImage={false}
+            projects={projects}
+            onSave={handleTestimonialAdd}
+            onRemoveImage={() => {}}
+            onClose={() => setShowAddTestiModal(false)}
+          />
         )}
       </AnimatePresence>
     </div>
